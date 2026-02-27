@@ -1,0 +1,45 @@
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# --- Entornos Virtuales ---
+# Muy importante: No queremos subir las librerías instaladas, solo el código
+.venv/
+venv/
+ENV/
+env/
+
+# --- Variables de Entorno (SEGURIDAD) ---
+# Aquí irán tus contraseñas de la base de datos más adelante
+.env
+.env.local
+
+# --- IDEs ---
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# --- Docker ---
+# Ignora los datos persistentes de la base de datos si decides mapearlos a una carpeta
+postgres_data/
+
+# --- Logs ---
+*.log
