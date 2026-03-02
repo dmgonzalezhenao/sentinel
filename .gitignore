@@ -19,26 +19,26 @@ wheels/
 .installed.cfg
 *.egg
 
-# --- Entornos Virtuales ---
-# Muy importante: No queremos subir las librerías instaladas, solo el código
+# --- Virtual Environments ---
+# Essential: We ignore installed libraries, only tracking the source code
 .venv/
 venv/
 ENV/
 env/
 
-# --- Variables de Entorno (SEGURIDAD) ---
-# Aquí irán tus contraseñas de la base de datos más adelante
+# --- Environment Variables (SECURITY) ---
+# This is where database credentials and secrets live
 .env
 .env.local
 
-# --- IDEs ---
+# --- IDEs & Editors ---
 .vscode/
 .idea/
 *.swp
 *.swo
 
 # --- Docker ---
-# Ignora los datos persistentes de la base de datos si decides mapearlos a una carpeta
+# Ignore persistent database data if mapped to a local folder
 postgres_data/
 
 # --- Logs ---
