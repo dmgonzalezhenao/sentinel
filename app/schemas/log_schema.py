@@ -1,5 +1,5 @@
 """
-Sentinel API data schemas
+Sentinel API data schemas.
 
 This module defines schemas for data validation and serialization.
 """

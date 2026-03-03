@@ -12,7 +12,7 @@ from datetime import datetime, timezone
 from typing import Any
 
 # Import LogCreate object to get log's format
-from app.schemas import LogCreate
+from app.schemas.log_schema import LogCreate
 
 # Initialize the FastAPI application with metadata
 app = FastAPI(
