@@ -1,5 +1,4 @@
 # Especificación de Requerimientos - Project Sentinel
-`![Status: Draft](https://img.shields.io/badge/Status-Draft-yellow) ![Version: 1.0](https://img.shields.io/badge/Version-1.0-blue)`
 
 ## 1. Objetivo del Proyecto
 Desarrollar una infraestructura de observabilidad "AI-Ready" capaz de centralizar registros de eventos (logs) de múltiples servicios, garantizando la integridad de los datos y preparando el terreno para análisis predictivos.
@@ -36,9 +35,10 @@ Cada log enviado debe seguir obligatoriamente esta estructura:
     "key": "value"
   }
 }
+```
 
 ## Checklist de Progreso
 - [x] Definición de Requerimientos
-- [ ] Implementación de API Base (Fase 1)
-- [ ] Validación con Pydantic (Fase 2)
+- [X] Implementación de API Base (Fase 1)
+- [X] Validación con Pydantic (Fase 2)
 - [ ] Conexión con PostgreSQL (Fase 3)

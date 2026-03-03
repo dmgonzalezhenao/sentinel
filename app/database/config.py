@@ -8,9 +8,13 @@ declarative base for the ORM models.
 # os module to get url from an environmental file
 import os
 
-# Import sqlalchemy functions to handle connection
+# Import create engine to config connection from Python to the database
 from sqlalchemy import create_engine
+
+# Import declarative base from SQLAlchemy to handle the classes of the database in models.py
 from sqlalchemy.ext.declarative import declarative_base
+
+# Import session maker to create multiple sessions to connect to the database
 from sqlalchemy.orm import sessionmaker
 
 # Function to load enviromental files
@@ -52,7 +56,7 @@ def get_db():
        are released back to the connection pool, even if an error occurs.
 
     Yields:
-        Session: An active SQLAlchemy database session.
+    Session: An active SQLAlchemy database session.
     """
     # Create local session
     db = SessionLocal()
