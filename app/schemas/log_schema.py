@@ -76,7 +76,7 @@ class LogCreate(BaseModel):
         examples=["2026-02-27T15:30:00Z"]
     )
     
-    metadata : dict[str, Any] = Field(
+    log_metadata : dict[str, Any] = Field(
         # If there's no metadata, put it as empty
         default={},
 

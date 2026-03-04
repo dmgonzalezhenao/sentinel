@@ -47,5 +47,5 @@ class Log(Base):
     service_name = Column(String(50), index=True)
     log_level = Column(String(20), nullable=False)
     message = Column(String(1000), nullable=False)
-    metadata = Column(JSONB, nullable=True)
+    log_metadata = Column(JSONB, nullable=True)
     timestamp = Column(DateTime(timezone=True), server_default=func.now())
