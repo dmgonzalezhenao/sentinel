@@ -40,9 +40,3 @@ Cada log enviado debe seguir obligatoriamente esta estructura:
   }
 }
 ```
-
-## Checklist de Progreso
-- [x] Definición de Requerimientos
-- [X] Implementación de API Base (Fase 1)
-- [X] Validación con Pydantic (Fase 2)
-- [ ] Conexión con PostgreSQL (Fase 3)
