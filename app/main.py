@@ -20,7 +20,6 @@ from app.crud.log_crud import create_log as crud_save_log
 from datetime import datetime, timezone
 from typing import Any
 from sqlalchemy.orm import Session
-from app.database.models import Log
 
 # Initialize the FastAPI application with metadata
 app = FastAPI(
@@ -48,8 +47,8 @@ async def health_check() -> dict[str, Any]:
         }
     }
 
-@app.post("/v1/logs", tags=["Ingestion"], status_code=201)
-async def ingest_log(log: LogCreate, db: Session = Depends(get_db)) -> Log:
+@app.post("/v1/logs", tags=["Ingestion"], status_code=201, response_model=None)
+async def ingest_log(log: LogCreate, db: Session = Depends(get_db)):
     """
     Receives logs from external services, validates them, 
     and persists them into the database.
