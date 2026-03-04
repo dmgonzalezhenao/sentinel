@@ -5,14 +5,22 @@ This module initializes the FastAPI application and defines the core routes
 for log ingestion and system health monitoring.
 """
 # Import FastAPI object
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 
-# Import datetime to log timestamp for health route and Any for Type Hinting
+# Import LogCreate object to get log data schema
+from app.schemas.log_schema import LogCreate
+
+# Import function to create a database session
+from app.database.config import get_db
+
+# Import CRUD logic to save logs in the database
+from app.crud.log_crud import create_log as crud_save_log
+
+# Import types for static analysis and type hinting
 from datetime import datetime, timezone
 from typing import Any
-
-# Import LogCreate object to get log's format
-from app.schemas.log_schema import LogCreate
+from sqlalchemy.orm import Session
+from app.database.models import Log
 
 # Initialize the FastAPI application with metadata
 app = FastAPI(
@@ -40,14 +48,12 @@ async def health_check() -> dict[str, Any]:
         }
     }
 
-@app.post("/v1/logs", tags=["Ingestion"])
-async def create_log(log: LogCreate) -> dict[str, Any]:
+@app.post("/v1/logs", tags=["Ingestion"], status_code=201)
+async def ingest_log(log: LogCreate, db: Session = Depends(get_db)) -> Log:
     """
-    Endpoint to receive logs from external services.
-    FastAPI will automatically validate the data using the LogCreate schema.
+    Receives logs from external services, validates them, 
+    and persists them into the database.
     """
-    # For now, returns a success message
-    return {
-        "status": "success",
-        "received_log": log
-    }
+    
+    # Persist the validated log and return the database record
+    return crud_save_log(db=db, log_data=log)
