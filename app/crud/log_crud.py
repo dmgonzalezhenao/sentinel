@@ -1,17 +1,19 @@
 """
-Sentinel API CRUD Module for logs
+Sentinel API CRUD operations for logs.
 
-This module maps log schema from Pydantic to a log class
-in the database and inserts the log once it is validated.
+This module implements the logic for interacting with the database,
+including log ingestion, record retrieval, and specialized filtering 
+based on service identifiers and severity levels.
 """
+
 # Import session object to access the database
 from sqlalchemy.orm import Session
 
 # Import Log class (logs table from database)
 from app.database.models import Log
 
-# Import Pydantic schema for log data validation
-from app.schemas.log_schema import LogCreate 
+# Import Pydantic schema for logs input and output
+from app.schemas.log_schemas import LogCreate, LogResponse
 
 def create_log(db: Session, log_data: LogCreate) -> Log:
     """
@@ -43,3 +45,38 @@ def create_log(db: Session, log_data: LogCreate) -> Log:
 
         # Raise error to main
         raise e
+    
+def get_logs(
+    db: Session, 
+    service_name: str | None = None, 
+    log_level: str | None = None, 
+    limit: int = 10
+) -> list[Log]:
+    """
+    Retrieve a collection of logs with optional filtering and pagination.
+    """
+
+    # Prepares query for the database (SELECT * FROM logs)
+    query = db.query(Log)
+
+    # If there's service_name provided
+    if service_name is not None:
+        # Filter data by service_name
+        query = query.filter(Log.service_name == service_name)
+
+    # If there's log level provided
+    if log_level is not None:
+        # Filter data by log_level
+        query = query.filter(Log.log_level == log_level)
+
+    # Return query to the database with the limit
+    return query.limit(limit).all()
+
+def get_logs_by_id(
+    db: Session,
+    log_id: int 
+) -> Log | None:
+    """
+    Retrieve a specific log by its id.
+    """
+    return db.query(Log).filter(Log.id == log_id).first()
