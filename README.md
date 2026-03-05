@@ -9,7 +9,7 @@
 
 ## 📋 Documentación
 Para una visión detallada de los objetivos y especificaciones técnicas, consulta:
-* [Especificación de Requerimientos](./docs/REQUIREMENTS.md)
+* [Especificación de Requerimientos](./docs/requirements.md)
 
 ## 🛠️ Stack Tecnológico (Estado Actual)
 
