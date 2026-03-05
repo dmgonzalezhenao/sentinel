@@ -13,7 +13,7 @@ Table: logs
 | service_name | String    | Indexed, e.g. 'web-app'      |
 | log_level    | String    | INFO, ERROR, etc.            |
 | message      | Text      | Main description             |
-| metadata     | JSONB     | Flexible software-specific   |
+| log_metadata | JSONB     | Flexible software-specific   |
 | timestamp    | DateTime  | Server default now           |
 -----------------------------------------------------------
 
