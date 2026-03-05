@@ -35,7 +35,7 @@ Cada log enviado debe seguir obligatoriamente esta estructura:
   "log_level": "INFO | WARNING | ERROR | CRITICAL",
   "message": "string",
   "timestamp": "2026-02-27T15:30:00Z",
-  "metadata": {
+  "log_metadata": {
     "key": "value"
   }
 }
