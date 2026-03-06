@@ -12,8 +12,8 @@ Desarrollar una infraestructura de observabilidad "AI-Ready" capaz de centraliza
 | **RF-03** | Persistencia | Almacenamiento de eventos validados en base de datos PostgreSQL. | ✅ |
 | **RF-04** | Gestión de Metadata | Soporte para información contextual flexible mediante campos JSONB. | ✅ |
 | **RF-05** | Normalización | Limpieza y estandarización de logs antes del almacenamiento. | ✅ |
-| **RF-06** | Consulta con Filtros | Endpoint GET para buscar logs por servicio, nivel de severidad y rango de fechas. | 🏗️ |
-| **RF-07** | Paginación de Datos | Implementación de límites y offsets para manejar grandes volúmenes de registros. | 🏗️ |
+| **RF-06** | Consulta con Filtros | Endpoint GET para buscar logs por servicio, nivel de severidad y rango de fechas. | ✅ |
+| **RF-07** | Paginación de Datos | Implementación de límites y offsets para manejar grandes volúmenes de registros. | ✅ |
 | **RF-08** | Monitoreo de Salud | El endpoint de salud debe verificar la conexión activa con la base de datos. | 🏗️ |
 
 ## 3. Requerimientos No Funcionales (RNF)
