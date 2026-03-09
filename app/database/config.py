@@ -5,8 +5,8 @@ This module configures the connection to the PostgreSQL database in Neon.
 It initializes the SQLAlchemy engine, the session factory, and the 
 declarative base for the ORM models.
 """
-# os module to get url from an environmental file
-import os
+# Import settings object to get database url
+from app.core.config import settings
 
 # Import create engine to config connection from Python to the database
 from sqlalchemy import create_engine
@@ -14,17 +14,11 @@ from sqlalchemy import create_engine
 # Import declarative base from SQLAlchemy to handle the classes of the database in models.py
 from sqlalchemy.ext.declarative import declarative_base
 
-# Import session maker to create multiple sessions to connect to the database
+# Import sessionmaker to create multiple sessions to connect to the database
 from sqlalchemy.orm import sessionmaker
 
-# Function to load enviromental files
-from dotenv import load_dotenv
-
-# Load environment variables from the .env file in the root directory
-load_dotenv()
-
-# Fetch the database URL from environment variables
-DATABASE_URL = os.getenv("DATABASE_URL")
+# Fetch the database URL from settings object
+DATABASE_URL: str | None = settings.DATABASE_URL
 
 # Explicit check to satisfy the type checker and ensure security
 if DATABASE_URL is None:
@@ -36,7 +30,7 @@ engine = create_engine(DATABASE_URL, pool_pre_ping=True)
 
 # SessionLocal will be used to create a new database session for each request
 # Autocommit as false ensures that data won't be modified until everything goes good and there's no
-# errors connection or invalid or corrupt data
+# connection errors or invalid or corrupt data
 # Autoflush as false ensures that Python won't send old queries to the database
 # binds the session to the specified engine
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
