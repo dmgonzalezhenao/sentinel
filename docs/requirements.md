@@ -17,6 +17,10 @@ Desarrollar una infraestructura de observabilidad "AI-Ready" capaz de centraliza
 | **RF-08** | Monitoreo de Salud | El endpoint de salud debe verificar la conexión activa con la base de datos. | ✅ |
 | **RF-09** | Configuración Centralizada | Gestión de secretos (.env) y constantes (VERSION) desde un módulo central en core/. | ✅ |
 | **RF-10** | Sistema de Logging | Registro de eventos y errores en consola y en archivos físico con trazabilidad | ✅ |
+| **RF-11** | Gestión de Usuarios | El sistema debe permitir el registro y gestión de usuarios/servicios autorizados. | 🏗️ |
+| **RF-12** | Autenticación JWT | El sistema debe emitir tokens de acceso seguros para validar la identidad de los clientes. | 🏗️ |
+| **RF-13** | Protección de rutas | Los endpoints de ingesta y consulta deben ser accesibles solo para usuarios autenticados. | 🏗️ |
+| **RF-14** | Relación Log-Usuario | Cada log guardado debe estar vinculado obligatoriamente al ID del usuario/servicio que lo generó. | 🏗️ |
 
 ## 3. Requerimientos No Funcionales (RNF)
 
@@ -25,7 +29,9 @@ Desarrollar una infraestructura de observabilidad "AI-Ready" capaz de centraliza
 | **RNF-01** | Asincronía | El procesamiento interno no debe bloquear la respuesta HTTP al cliente. | ✅ |
 | **RNF-02** | Contenerización | Ejecución de todo el stack tecnológico mediante Docker Compose. | 🏗️ |
 | **RNF-03** | Tipado Estricto | Implementación completa de Type Hints y Pydantic para robustez. | ✅ |
-| **RNF-04** | Seguridad de Acceso | Validación de identidad mediante API Keys para servicios autorizados. | 🏗️ |
+| **RNF-04** | Seguridad de Acceso | Validación de identidad mediante JWT para servicios autorizados. | 🏗️ |
+| **RNF-05** | Modularidad | La API debe usar APIRouter para mantener una separación clara de responsabilidades (Separation of Concerns). | 🏗️ |
+| **RNF-06** | Caducidad de Tokens | Los tokens de acceso deben tener un tiempo de vida (TTL) configurable por seguridad. | 🏗️ |
 
 ## 4. Definición del Contrato (Data Schema)
 
