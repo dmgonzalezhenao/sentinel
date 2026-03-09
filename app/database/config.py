@@ -62,6 +62,9 @@ def get_db():
     # Create local session
     db = SessionLocal()
 
+    # Log session aperture in Sentinel's log
+    logger.info("DB: opening new session for request")
+
     # Try to connect to database
     try:
         # Suspend execution and return connection
@@ -75,4 +78,6 @@ def get_db():
 
     # Finally close connection
     finally:
+        # Log session close
+        logger.info("DB: closing session and returning to pool")
         db.close()
