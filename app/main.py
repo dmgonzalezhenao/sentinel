@@ -13,6 +13,9 @@ from app.schemas.log_schemas import LogLevel, LogCreate, LogResponse
 # Import function to create a database session
 from app.database.config import get_db
 
+# Import utils logic from database to check connection
+from app.database.utils import check_db_connection
+
 # Import CRUD logic to save logs in the database
 from app.crud.log_crud import create_log as crud_save_log, get_logs as crud_get_logs, get_logs_by_id as crud_get_logs_by_id
 
@@ -21,28 +24,35 @@ from datetime import datetime, timezone
 from typing import Any, Annotated
 from sqlalchemy.orm import Session
 
+# Const to log Sentinel version
+VERSION = "0.1.0"
 # Initialize the FastAPI application with metadata
 app = FastAPI(
     title="Project Sentinel",
     description="AI-Ready Infrastructure for Log Observability and Anomaly Detection.",
-    version="0.1.0"
+    version=VERSION
 )
 
 @app.get("/health", tags=["Monitoring"])
-async def health_check() -> dict[str, Any]:
+async def health_check(db: Session = Depends(get_db)) -> dict[str, Any]:
     """
-    Check the operational status of the API and its core components.
+    Check the operational status of the API and connection to the database.
     
     Returns:
-    A dictionary containing the status, current timestamp, and 
+    A dictionary containing the status, current timestamp, version, and
     subsystem health indicators.
     """
+
+    # Check database connection (Boolean value)
+    db_alive = check_db_connection(db)
+
+    # Return result
     return {
-        "status": "operational",
+        "status": "operational" if db_alive else "degraded",
         "timestamp": datetime.now(timezone.utc).isoformat(),
-        "version": "0.1.0",
+        "version": VERSION,
         "services": {
-            "database": "pending",  # We will update this once we connect Postgres
+            "database": "operational" if db_alive else "down",
             "ml_engine": "initialized" # Placeholder for your ML logic
         }
     }
