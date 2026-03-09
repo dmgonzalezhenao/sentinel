@@ -28,7 +28,7 @@ class Settings(BaseSettings):
     # BaseSettings will automatically search those values in
     # the project files
     DATABASE_URL: str | None = Field(default=None, validation_alias="DATABASE_URL")
-    VERSION: str = "0.1.0"
+    VERSION: str = "0.2.0"
     PROJECT_NAME: str = "Sentinel API"
 
     # Configuration to specifically search in .env file for the variable names
