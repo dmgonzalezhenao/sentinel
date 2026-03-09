@@ -16,6 +16,9 @@ from app.schemas.log_schemas import LogLevel, LogCreate, LogResponse
 # Import function to create a database session
 from app.database.config import get_db
 
+# Import Log database object for type hinting
+from app.database.models import Log
+
 # Import utils logic from database to check connection
 from app.database.utils import check_db_connection
 
@@ -27,12 +30,39 @@ from datetime import datetime, timezone
 from typing import Any, Annotated
 from sqlalchemy.orm import Session
 
+# Import sentinel logger
+from app.core.logger import logger
+
 # Initialize the FastAPI application with metadata
 app = FastAPI(
     title=settings.PROJECT_NAME,
     description="AI-Ready Infrastructure for Log Observability and Anomaly Detection.",
     version=settings.VERSION
 )
+
+# --- Lifecycle logs ---
+@app.on_event("startup")
+async def startup_event() -> None:
+    """
+    Logs the startup event in Sentinel's logger.
+
+    Returns:
+    None
+    """
+    # Log startup as info
+    logger.info(f"*** Starting {settings.PROJECT_NAME} v{settings.VERSION} ***")
+
+@app.on_event("shutdown")
+async def shutdown_event() -> None:
+    """
+    Logs the shutdown event in Sentinel's logger.
+
+    Returns:
+    None
+    """
+    # Log shutdown as info
+    logger.info(f"*** Shutting down {settings.PROJECT_NAME} ***")
+
 
 @app.get("/health", tags=["Monitoring"])
 async def health_check(db: Session = Depends(get_db)) -> dict[str, Any]:
@@ -43,6 +73,8 @@ async def health_check(db: Session = Depends(get_db)) -> dict[str, Any]:
     A dictionary containing the status, current timestamp, version, and
     subsystem health indicators.
     """
+    # Log /health call
+    logger.info("Health check requested")
 
     # Check database connection (Boolean value)
     db_alive = check_db_connection(db)
@@ -65,14 +97,28 @@ async def ingest_log(
 
     # Initialize a session with get_db function
     db: Session = Depends(get_db)
-):
+) -> Log:
     """
     Receives logs from external services, validates them, 
     and persists them to the database
+
+    Returns:
+    Log object from database
     """
+    try:
+        # Log the ingestion
+        logger.info(f"Ingestion request received from service: {log.service_name}")
+
+        # Persist the validated log and return the database record
+        return crud_save_log(db=db, log_data=log)
     
-    # Persist the validated log and return the database record
-    return crud_save_log(db=db, log_data=log)
+    # If there's an error
+    except Exception as e:
+        # Log error in Sentinel's logger
+        logger.error(f"Ingestion failed for service {log.service_name}: {str(e)}")
+
+        # Raise exception
+        raise HTTPException(status_code=500, detail="Internal server error during log ingestion")
 
 @app.get("/v1/logs", tags=["Retrieval"], response_model=list[LogResponse])
 async def read_logs(
@@ -83,7 +129,7 @@ async def read_logs(
     service_name: Annotated[str | None, Query(max_length=50)] = None,
     log_level: Annotated[LogLevel | None, Query()] = None,
     limit: Annotated[int, Query(ge=1, le=100)] = 10
-):
+) -> list[Log]:
     """
     Retrieve a filtered list of logs from the database.
 
@@ -99,10 +145,26 @@ async def read_logs(
 
     Returns:
         list[LogResponse]: A list of log records matching the criteria.
+        NOTE: In type hinting appears list[Log], but actually is a list[LogResponse]
+    
+    Raises:
+        HTTPException: 500 error if there's an error in connection.
     """
 
-    # Return the logs list with get logs function
-    return crud_get_logs(db, service_name=service_name, log_level=log_level, limit=limit)
+    try:
+        # Log read logs in Sentinel's logger
+        logger.info(f"Bulk log retrieval requested. Filters: service={service_name}, level={log_level}")
+
+        # Return the logs list with get logs function
+        return crud_get_logs(db, service_name=service_name, log_level=log_level, limit=limit)
+    
+    # If there's an error
+    except Exception as e:
+        # Log error message
+        logger.error(f"Error retrieving logs: {str(e)}")
+
+        # Raise HTTP exception
+        raise HTTPException(status_code=500, detail="Error fetching logs from database")
 
 @app.get("/v1/logs/{log_id}", tags=["Retrieval"], response_model=LogResponse)
 async def read_log(
@@ -113,7 +175,7 @@ async def read_log(
 
     # Connect to the database
     db: Session = Depends(get_db)
-):
+) -> Log:
     """
     Retrieve a specific log record by its unique identifier.
 
@@ -131,13 +193,34 @@ async def read_log(
 
     Raises:
         HTTPException: 404 error if the log record does not exist in the database.
+        HTTPException: 500 error if there's an error in connection.
     """
-    # Get log from the database
-    db_log = crud_get_logs_by_id(db, log_id=log_id)
+    try:
+        # Log retrieval in Sentinel's logger
+        logger.info(f"Single log retrieval requested for ID: {log_id}")
 
-    # Check if log exists
-    if db_log is None:
-        raise HTTPException(status_code=404, detail="Log record not found")
+        # Get log from the database
+        db_log = crud_get_logs_by_id(db, log_id=log_id)
+
+        # Check if log exists
+        if db_log is None:
+            # Log a warning
+            logger.warning(f"Log ID {log_id} not found in database")
+
+            # Raise not found exception
+            raise HTTPException(status_code=404, detail="Log record not found")
+        
+        # Return log
+        return db_log
     
-    # Return log
-    return db_log
+    # Exception 404
+    except HTTPException:
+        raise
+
+    # Exception in connection
+    except Exception as e:
+        # Log error to Sentinel's logger
+        logger.error(f"Unexpected error retrieving log {log_id}: {str(e)}")
+
+        # Raise HTTP exception
+        raise HTTPException(status_code=500, detail="An unexpected error occurred")
