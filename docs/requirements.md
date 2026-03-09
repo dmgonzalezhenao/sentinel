@@ -14,7 +14,7 @@ Desarrollar una infraestructura de observabilidad "AI-Ready" capaz de centraliza
 | **RF-05** | Normalización | Limpieza y estandarización de logs antes del almacenamiento. | ✅ |
 | **RF-06** | Consulta con Filtros | Endpoint GET para buscar logs por servicio, nivel de severidad y rango de fechas. | ✅ |
 | **RF-07** | Paginación de Datos | Implementación de límites y offsets para manejar grandes volúmenes de registros. | ✅ |
-| **RF-08** | Monitoreo de Salud | El endpoint de salud debe verificar la conexión activa con la base de datos. | 🏗️ |
+| **RF-08** | Monitoreo de Salud | El endpoint de salud debe verificar la conexión activa con la base de datos. | ✅ |
 
 ## 3. Requerimientos No Funcionales (RNF)
 
