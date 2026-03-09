@@ -17,11 +17,18 @@ from sqlalchemy.ext.declarative import declarative_base
 # Import sessionmaker to create multiple sessions to connect to the database
 from sqlalchemy.orm import sessionmaker
 
+# Import sentinel logger
+from app.core.logger import logger
+
 # Fetch the database URL from settings object
 DATABASE_URL: str | None = settings.DATABASE_URL
 
 # Explicit check to satisfy the type checker and ensure security
 if DATABASE_URL is None:
+    # Log error as critical
+    logger.critical("DATABASE_URL is missing in environment variables!")
+
+    # Raise value error
     raise ValueError("DATABASE_URL is not set in the environment variables")
 
 # Create the SQLAlchemy engine. 
@@ -59,6 +66,12 @@ def get_db():
     try:
         # Suspend execution and return connection
         yield db
+
+    # Exception 
+    except Exception as e:
+        # Log error
+        logger.error(f"Database session error during request cycle: {str(e)}")
+        raise e
 
     # Finally close connection
     finally:
