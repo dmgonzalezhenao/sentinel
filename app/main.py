@@ -7,6 +7,9 @@ for log ingestion and system health monitoring.
 # Import FastAPI object
 from fastapi import FastAPI, Depends, Body, Path, Query, HTTPException
 
+# Import settings object 
+from app.core.config import settings
+
 # Import LogCreate object to get log data schema
 from app.schemas.log_schemas import LogLevel, LogCreate, LogResponse
 
@@ -24,13 +27,11 @@ from datetime import datetime, timezone
 from typing import Any, Annotated
 from sqlalchemy.orm import Session
 
-# Const to log Sentinel version
-VERSION = "0.1.0"
 # Initialize the FastAPI application with metadata
 app = FastAPI(
-    title="Project Sentinel",
+    title=settings.PROJECT_NAME,
     description="AI-Ready Infrastructure for Log Observability and Anomaly Detection.",
-    version=VERSION
+    version=settings.VERSION
 )
 
 @app.get("/health", tags=["Monitoring"])
@@ -50,7 +51,7 @@ async def health_check(db: Session = Depends(get_db)) -> dict[str, Any]:
     return {
         "status": "operational" if db_alive else "degraded",
         "timestamp": datetime.now(timezone.utc).isoformat(),
-        "version": VERSION,
+        "version": settings.VERSION,
         "services": {
             "database": "operational" if db_alive else "down",
             "ml_engine": "initialized" # Placeholder for your ML logic
