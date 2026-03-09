@@ -16,7 +16,7 @@ Desarrollar una infraestructura de observabilidad "AI-Ready" capaz de centraliza
 | **RF-07** | Paginación de Datos | Implementación de límites y offsets para manejar grandes volúmenes de registros. | ✅ |
 | **RF-08** | Monitoreo de Salud | El endpoint de salud debe verificar la conexión activa con la base de datos. | ✅ |
 | **RF-09** | Configuración Centralizada | Gestión de secretos (.env) y constantes (VERSION) desde un módulo central en core/. | ✅ |
-| **RF-10** | Sistema de Logging | Registro de eventos y errores en consola y en archivos físico con trazabilidad | 🏗️ |
+| **RF-10** | Sistema de Logging | Registro de eventos y errores en consola y en archivos físico con trazabilidad | ✅ |
 
 ## 3. Requerimientos No Funcionales (RNF)
 
