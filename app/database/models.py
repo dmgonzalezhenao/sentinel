@@ -27,6 +27,7 @@ Table: users
 | email           | String    | Indexed, e.g. 'example@gmail.com   |
 | hashed_password | String    | Hash value                         |
 | is_active       | Boolean   | Default=True                       |
+| role            | String    | ADMIN, SERVICE and VIEWER          |
 --------------------------------------------------------------------
 
 """
@@ -70,7 +71,7 @@ class User(Base):
     """
     Users class from Sentinel API database
 
-    Once a user is registered, data is saved
+    Once a user is registered, data is persisted
     in this table in the database.
     """
 
@@ -83,7 +84,8 @@ class User(Base):
     email = Column(String(100), unique=True, index=True, nullable=False)
     hashed_password = Column(String(255), nullable=False)
     is_active = Column(Boolean, default=True)
-    
-    # Timestamps for auditory
+    role = Column(String(20), nullable=False)
+
+    # Timestamps for auditing.
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
