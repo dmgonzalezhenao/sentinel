@@ -123,3 +123,15 @@ class UserResponse(UserBase):
     
     # Configures Pydantic to work with SQLAlchemy models
     model_config = ConfigDict(from_attributes=True)
+
+class UserLogin(BaseModel):
+    """
+    Schema for user login.
+
+    This model defines required data to validate user login data.
+    """
+    email: EmailStr
+    password: str
+
+    class Config:
+        from_attributes = True
