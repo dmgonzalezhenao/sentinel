@@ -10,7 +10,7 @@ CRUD operations for logs.
 # The other objects are for hinting
 from fastapi import APIRouter, Depends, Body, Query, Path, HTTPException
 
-# Import LogCreate object to get log data schema
+# Import Pydantic Logs Schemas
 from app.schemas.log_schemas import LogLevel, LogCreate, LogResponse
 
 # Import CRUD logic to use logs in the database
@@ -29,8 +29,7 @@ from app.database.models import Log
 from app.core.logger import logger
 
 # Import types for static analysis and type hinting
-from datetime import datetime, timezone
-from typing import Any, Annotated
+from typing import Annotated
 from sqlalchemy.orm import Session
 
 # Create router with path logs
