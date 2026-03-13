@@ -79,17 +79,6 @@ class UserCreate(UserBase):
         examples=["ILOVEMYSELF2020", "theOdd1sout"]
     )
 
-    role : UserRole = Field(
-        # Default is viewer (Lowest role level)
-        default=UserRole.VIEWER,
-
-        # Description and examples for documentation
-        description="""The role level of the user. Values must be:
-                        'ADMIN', 'SERVICE', 'VIEWER'.
-        """,
-        examples=["ADMIN", "VIEWER"]
-    )
-
 class UserResponse(UserBase):
     """
     Schema for returning user from de database.
