@@ -12,31 +12,48 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 # Import pydantic to ensure Settings will find database url
 from pydantic import Field
 
-# Import any type for type hinting
-from typing import Any
+# Import os and PathLib to recognize environmental variables
+import os
+from pathlib import Path
+
+# Root path
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 class Settings(BaseSettings):
     """
-    Settings object that saves core data of Sentinel API,
-    it includes:
-    - URL to connect to the database
-    - Sentinel API's version
-    - Project's name
+    Application settings and configuration manager for Sentinel API.
+
+    This class centralizes all environment-specific variables, including 
+    database connectivity, security parameters for JWT authentication, 
+    and project metadata. It leverages Pydantic for automatic validation 
+    and .env file parsing.
+
+    Attributes:
+        DATABASE_URL: The connection string for the PostgreSQL (Neon) database.
+        VERSION: Current release version of the API.
+        PROJECT_NAME: Formal name of the application.
+        SECRET_KEY: Cryptographic key used for signing JWT tokens.
+        ALGORITHM: Encryption algorithm used for session management.
+        ACCESS_TOKEN_EXPIRE_MINUTES: Duration of token validity.
     """
 
     # Define global variables
     # BaseSettings will automatically search those values in
     # the project files
-    DATABASE_URL: str | None = Field(default=None, validation_alias="DATABASE_URL")
+    DATABASE_URL: str = Field(validation_alias="DATABASE_URL")
     VERSION: str = "0.2.0"
     PROJECT_NAME: str = "Sentinel API"
+    SECRET_KEY: str = Field(validation_alias="SECRET_KEY")
+    ALGORITHM: str = Field(default="HS256")
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = Field(default=30, gt=0)
 
     # Configuration to specifically search in .env file for the variable names
     model_config = SettingsConfigDict(
-        env_file=".env",
+        # Search .env file in root directory
+        env_file=os.path.join(BASE_DIR, ".env"),
         env_file_encoding="utf-8",
         extra="ignore" 
     )
 
-# Create object
+# Create object (Could generate Pylance error)
 settings = Settings()
