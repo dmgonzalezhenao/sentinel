@@ -10,8 +10,8 @@ from fastapi import FastAPI, Depends
 # Import settings object 
 from app.core.config import settings
 
-# Import routers for logs and users 
-from app.api.v1.endpoints import logs, users
+# Import endpoints routers
+from app.api.v1.endpoints import logs, users, auth
 
 # Import function to create a database session
 from app.database.config import get_db
@@ -37,6 +37,7 @@ app = FastAPI(
 # Include endpoints from log and user routers
 app.include_router(logs.router, prefix="/api/v1")
 app.include_router(users.router, prefix="/api/v1")
+app.include_router(auth.router, prefix="/api/v1")
 
 # --- Lifecycle logs ---
 @app.on_event("startup")
