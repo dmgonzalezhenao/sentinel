@@ -22,6 +22,7 @@ from app.core.logger import logger
 def get_user_by_email(db: Session, email: str) -> User | None:
     """
     Function to get user from database by its email.
+    It's used to find user in login.
     """
     # Query the User table filtering by the provided email
     result = db.query(User).filter(User.email == email).first()
@@ -35,7 +36,24 @@ def get_user_by_email(db: Session, email: str) -> User | None:
     # Return result
     return result
 
-def create_user(db: Session, user: UserCreate):
+def get_user_by_id(db: Session, id: int) -> User | None:
+    """
+    Function to get user from database by its id.
+    It's used in dependencies to get validate user.
+    """
+    # Query the User table filtering by the provided id
+    result = db.query(User).filter(User.id == id).first()
+
+    # Check if there's result
+    if result:
+        logger.info(f"CRUD: Successfully retrieved user record with id: {id}")
+    else:
+        logger.warning(f"CRUD: User with id: {id} was not found")
+
+    # Return result
+    return result
+
+def create_user(db: Session, user: UserCreate) -> User:
     """
     Function that creates a new user in database with its hashed password.
     """
