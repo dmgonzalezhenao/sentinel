@@ -69,7 +69,11 @@ async def login(
     user = crud_get_user_by_email(db=db, email=user_credentials.email)
 
     # Validate password match and user existence
-    if user is None or not verify_password(user_credentials.password, str(user.hashed_password)):
+    if (
+        user is None or 
+        not verify_password(user_credentials.password, str(user.hashed_password))
+        or not bool(user.is_active)
+        ):
         logger.warning(f"API: Login failed for email: {user_credentials.email}")
         raise HTTPException(
             status_code=401,
