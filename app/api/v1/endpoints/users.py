@@ -10,6 +10,9 @@ CRUD operations for users.
 # The other objects are for hinting
 from fastapi import APIRouter, Depends, Body, HTTPException
 
+# Import RoleChecker dependency to validate user's role
+from app.api.devs import get_current_user, RoleChecker
+
 # Import Pydantic User schemas
 from app.schemas.user_schemas import UserLogin, UserCreate, UserResponse
 
@@ -37,7 +40,10 @@ from sqlalchemy.orm import Session
 # Create router with path users
 router = APIRouter(prefix="/users", tags=["Users"])
 
-@router.post("/", status_code=201, response_model=UserResponse)
+# Define ONLY admin users can register other users
+allow_admin = RoleChecker(["ADMIN"])
+
+@router.post("/", status_code=201, response_model=UserResponse, dependencies=[Depends(allow_admin)])
 async def register_user(
     user_data: Annotated[UserCreate, Body(description="The user data for registration.")], 
     db: Session = Depends(get_db)) -> User:
@@ -59,7 +65,7 @@ async def register_user(
         HTTPException: 400 error if the email is already registered.
     """
     # Log user register
-    logger.info(f"Register attempt by user: {user_data.username}")
+    logger.info(f"Admin is creating new user: {user_data.username}")
 
     # Check if user exists
     existing_user = crud_get_user_by_email(db=db, email=user_data.email)
