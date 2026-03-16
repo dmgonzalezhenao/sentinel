@@ -22,7 +22,7 @@ from passlib.context import CryptContext
 from jose import jwt
 
 # Import settings from config module
-from config import settings
+from app.core.config import settings
 
 # Import objects for hinting
 from datetime import datetime, timedelta, timezone
