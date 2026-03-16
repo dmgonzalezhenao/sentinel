@@ -22,8 +22,11 @@ from app.crud.log_crud import (
 # Import function to create a database session
 from app.database.config import get_db
 
-# Import Log database object for type hinting
-from app.database.models import Log
+# Import dependencies to handle RBAC
+from app.api.devs import get_current_user, RoleChecker
+
+# Import Log and User database models for type hinting
+from app.database.models import Log, User
 
 # Import logger object for sentinel's logging
 from app.core.logger import logger
@@ -38,14 +41,24 @@ router = APIRouter(prefix="/logs", tags=["Logs"])
 @router.post("/", status_code=201, response_model=LogResponse)
 async def ingest_log(
     log: Annotated[LogCreate, Body(description="The log data to be ingested")], 
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(RoleChecker(["ADMIN", "SERVICE"]))
 ) -> Log:
     """
     Receives logs from external services, validates them, 
-    and persists them to the database
+    and persists them to the database.
+
+    Args:
+        log (LogCreate): Schema containing service name, level, and message.
+        db (Session): Database session provided by dependency injection.
+        current_user (User): Authenticated user with SERVICE or ADMIN role.
 
     Returns:
-    Log object from database
+        Log: The persisted log record object.
+    
+    Raises:
+        HTTPException: 401 if token is invalid.
+        HTTPException: 403 if user role is not authorized.
     """
     # Log the ingestion
     logger.info(f"Ingestion request received from service: {log.service_name}")
@@ -58,27 +71,28 @@ async def read_logs(
     db: Session = Depends(get_db),
     service_name: Annotated[str | None, Query(max_length=50)] = None,
     log_level: Annotated[LogLevel | None, Query()] = None,
-    limit: Annotated[int, Query(ge=1, le=100)] = 10
-) -> list[Log]:
+    limit: Annotated[int, Query(ge=1, le=100)] = 10,
+    current_user: User = Depends(RoleChecker(["ADMIN", "VIEWER"]))
+    ) -> list[Log]:
     """
     Retrieve a filtered list of logs from the database.
 
     This endpoint allows for searching logs based on the originating service 
-    name and the severity level. It supports pagination through a limit 
-    parameter to ensure optimal performance.
+    name and the severity level. Supports pagination.
 
     Args:
         service_name (str, optional): The name of the service that generated the log.
         log_level (str, optional): The severity level of the log (e.g., INFO, ERROR).
-        limit (int): The maximum number of log records to return (Default: 10, Max: 100).
+        limit (int): Maximum number of log records to return (Default: 10, Max: 100).
         db (Session): Database session dependency.
+        current_user (User): Authenticated user with VIEWER or ADMIN role.
 
     Returns:
         list[LogResponse]: A list of log records matching the criteria.
-        NOTE: In type hinting appears list[Log], but actually is a list[LogResponse]
     
     Raises:
-        HTTPException: 500 error if there's an error in connection.
+        HTTPException: 403 if user lacks required permissions.
+        HTTPException: 500 if there's a database connection error.
     """
     # Log read logs in Sentinel's logger
     logger.info(f"Bulk log retrieval requested. Filters: service={service_name}, level={log_level}")
@@ -89,26 +103,26 @@ async def read_logs(
 @router.get("/{log_id}", response_model=LogResponse)
 async def read_log(
     log_id: Annotated[int, Path(ge=1, description="The unique ID of the log record")],
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(RoleChecker(["ADMIN", "VIEWER"]))
 ) -> Log:
     """
     Retrieve a specific log record by its unique identifier.
 
-    This endpoint fetches the full details of a single log entry from the database.
-    If the provided ID does not match any existing record, a 404 Not Found 
-    error is returned to the client.
+    Fetches the full details of a single log entry. If the ID does not 
+    match any record, a 404 error is returned.
 
     Args:
-        log_id (int): The primary key of the log to be retrieved. 
-                     Must be an integer greater than or equal to 1.
+        log_id (int): The primary key of the log to be retrieved (min: 1).
         db (Session): Database session dependency.
+        current_user (User): Authenticated user with VIEWER or ADMIN role.
 
     Returns:
         LogResponse: The complete log object if found.
 
     Raises:
-        HTTPException: 404 error if the log record does not exist in the database.
-        HTTPException: 500 error if there's an error in connection.
+        HTTPException: 404 if the log record does not exist in the database.
+        HTTPException: 403 if user is not authorized.
     """
 
     # Log retrieval in Sentinel's logger
