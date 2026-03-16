@@ -13,6 +13,9 @@ Main functionality:
 # The other objects are for hinting
 from fastapi import APIRouter, Depends, Body, HTTPException
 
+# Import form object to validate data in swagger
+from fastapi.security import OAuth2PasswordRequestForm
+
 # Import sqalchemy session
 from sqlalchemy.orm import Session
 
@@ -42,39 +45,43 @@ router = APIRouter(prefix="/auth", tags=["Authentication"])
 
 @router.post("/login", response_model=Token, status_code=200)
 async def login(
-    user_credentials: Annotated[UserLogin, Body(description="User credentials for authentication.")], 
+    form_data: Annotated[OAuth2PasswordRequestForm, Depends()], 
     db: Session = Depends(get_db)
 ):
     """
     Authenticate a user and return a JWT access token.
     
-    This endpoint verifies the email and password, and if valid, 
-    returns a signed JWT for subsequent authorized requests.
+    This endpoint verifies the credentials provided via form-data 
+    (email as username) and returns a signed JWT.
 
     Args:
-        user_credentials (UserLogin): Schema containing email and plain password.
+        form_data (OAuth2PasswordRequestForm): Form containing 'username' (email) and 'password'.
         db (Session): Database session provided by dependency injection.
     
     Returns:
-        User: The authenticated user record if credentials are valid.
+        dict: A dictionary containing the access_token and token_type.
 
     Raises:
-        HTTPException: 401 error if email is not found or password does not match.
+        HTTPException: 401 error if credentials are invalid or user is inactive.
     """
 
+    # In swagger, the username is the user's email
+    email = form_data.username
+    password = form_data.password
+
     # Log login attempt
-    logger.info(f"API: Login attempt for email: {user_credentials.email}")
+    logger.info(f"API: Login attempt for email: {email}")
 
     # Search user in the database
-    user = crud_get_user_by_email(db=db, email=user_credentials.email)
+    user = crud_get_user_by_email(db=db, email=email)
 
     # Validate password match and user existence
     if (
         user is None or 
-        not verify_password(user_credentials.password, str(user.hashed_password))
+        not verify_password(password, str(user.hashed_password))
         or not bool(user.is_active)
         ):
-        logger.warning(f"API: Login failed for email: {user_credentials.email}")
+        logger.warning(f"API: Login failed for email: {email}")
         raise HTTPException(
             status_code=401,
             detail="Invalid email or password",
