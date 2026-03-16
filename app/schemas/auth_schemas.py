@@ -36,5 +36,5 @@ class TokenData(BaseModel):
         user_id (Optional[str]): The unique identifier of the user (subject).
         role (Optional[str]): The access level or role assigned to the user.
     """
-    user_id: str | None = None
+    user_id: int | None = None
     role: str | None = None
