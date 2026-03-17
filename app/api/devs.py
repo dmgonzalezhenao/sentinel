@@ -30,8 +30,9 @@ from app.crud.user_crud import get_user_by_id
 # Import TokenData object to validate input Token
 from app.schemas.auth_schemas import TokenData
 
-# Import User object for hinting
+# Imports for hinting
 from app.database.models import User
+from typing import Annotated
 
 # Import Sentinel's logger
 from app.core.logger import logger
@@ -96,30 +97,44 @@ def get_current_user(
     # Return user object
     return user
 
-def RoleChecker(allowed_roles: list[str]):
+class RoleChecker:
     """
-    Factory that generates role-specific validation dependencies.
-    Implements RBAC by checking the user's role against a whitelist.
+    Role validation dependency for Project Sentinel.
+
+    This class acts as a FastAPI dependency that verifies if the 
+    authenticated user possesses one of the allowed roles before 
+    granting access to a specific endpoint.
     """
-    def validator(current_user=Depends(get_current_user)):
+
+    def __init__(self, allowed_roles: list[str]):
         """
-        Wrapper validator function to validate user role
+        Initializes the checker with a list of authorized roles.
 
         Args:
-            Token from user's session.
+            allowed_roles (List[str]): List of roles (ADMIN, SERVICE, VIEWER) allowed to access.
         """
+        self.allowed_roles = allowed_roles
 
-        # Check user's role is valid
-        if current_user.role not in allowed_roles:
-            # Log user tried to access with invalid role
-            logger.warning(
-                f"Security: User {current_user.email} (Role: {current_user.role}) "
-                f"attempted to access an endpoint requiring: {allowed_roles}"
+    async def __call__(self, current_user: Annotated[User, Depends(get_current_user)]) -> User:
+        """
+        Executes identity and role validation.
+
+        This method is automatically called by FastAPI when used within Depends().
+        By returning 'User', it ensures the IDE recognizes 'current_user' as an 
+        instance, resolving SQLAlchemy 'Column[int]' typing conflicts.
+
+        Args:
+            current_user (User): User object retrieved via JWT token.
+
+        Returns:
+            User: The validated user object if permissions are met.
+
+        Raises:
+            HTTPException: 403 Forbidden if the user role is not in the allowed list.
+        """
+        if current_user.role not in self.allowed_roles:
+            raise HTTPException(
+                status_code=403,
+                detail=f"Access denied. Role required: {', '.join(self.allowed_roles)}"
             )
-            raise HTTPException(status_code=403, detail="Insufficient permissions")
-        
-        # return current user
         return current_user
-    
-    # Return wrapper validator
-    return validator
