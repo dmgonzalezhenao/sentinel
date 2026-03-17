@@ -18,13 +18,13 @@ from app.schemas.log_schemas import LogCreate, LogResponse
 # Import Sentinel's logger
 from app.core.logger import logger
 
-def create_log(db: Session, log_data: LogCreate) -> Log:
+def create_log(db: Session, log_data: LogCreate, user_id: int) -> Log:
     """
     Function to create a SQLAlchemy Log object using the data
     from log_data and insert log in logs table in the database.
     """
     # Dump data from log_data and create the Log object
-    db_log = Log(**log_data.model_dump()) 
+    db_log = Log(**log_data.model_dump(), user_id=user_id) 
 
     try:
         # Log attempt to insert data in database
@@ -62,7 +62,8 @@ def get_logs(
     db: Session, 
     service_name: str | None = None, 
     log_level: str | None = None, 
-    limit: int = 10
+    limit: int = 10,
+    user_id: int | None = None
 ) -> list[Log]:
     """
     Retrieve a collection of logs with optional filtering and pagination.
@@ -73,6 +74,10 @@ def get_logs(
     # Prepares query for the database (SELECT * FROM logs)
     query = db.query(Log)
 
+    # Check if there's user id provided
+    if user_id is not None:
+        query = query.filter(Log.user_id == user_id)
+
     # If there's service_name provided
     if service_name is not None:
         # Filter data by service_name
@@ -82,6 +87,7 @@ def get_logs(
     if log_level is not None:
         # Filter data by log_level
         query = query.filter(Log.log_level == log_level)
+
 
     # Return query to the database with the limit
     results = query.limit(limit).all()
@@ -94,19 +100,30 @@ def get_logs(
 
 def get_logs_by_id(
     db: Session,
-    log_id: int 
+    log_id: int,
+    user_id: int | None = None
 ) -> Log | None:
     """
     Retrieve a specific log by its id.
     """
-    # Make query to database
-    result = db.query(Log).filter(Log.id == log_id).first()
+    # Create query
+    query = db.query(Log).filter(Log.id == log_id)
+
+    # If there's id provided, make filter by user id
+    if user_id is not None:
+        query = query.filter(Log.user_id == user_id)
+    
+    # Execute query
+    result = query.first()
+
+    # Context for logger
+    context = f"User {user_id}" if user_id else "ADMIN"
 
     # Check result and log succesful retrieve or failure
     if result:
-        logger.info(f"CRUD: Successfully retrieved log record with ID: {log_id}")
+        logger.info(f"CRUD: Log ID {log_id} retrieved successfully for {context}")
     else:
-        logger.warning(f"CRUD: Log record with ID {log_id} was not found")
+        logger.warning(f"CRUD: Log ID {log_id} not found or access denied for {context}")
 
     # Return log
     return result
