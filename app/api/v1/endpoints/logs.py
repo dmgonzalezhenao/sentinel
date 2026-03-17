@@ -32,7 +32,7 @@ from app.database.models import Log, User
 from app.core.logger import logger
 
 # Import types for static analysis and type hinting
-from typing import Annotated
+from typing import Annotated, cast
 from sqlalchemy.orm import Session
 
 # Create router with path logs
@@ -61,10 +61,10 @@ async def ingest_log(
         HTTPException: 403 if user role is not authorized.
     """
     # Log the ingestion
-    logger.info(f"Ingestion request received from service: {log.service_name}")
+    logger.info(f"Service '{log.service_name}' (User ID: {current_user.id}) is ingesting a log.")
 
     # Persist the validated log and return the database record
-    return crud_save_log(db=db, log_data=log)
+    return crud_save_log(db=db, log_data=log, user_id=cast(int, current_user.id))
 
 @router.get("/", response_model=list[LogResponse])
 async def read_logs(
@@ -97,8 +97,11 @@ async def read_logs(
     # Log read logs in Sentinel's logger
     logger.info(f"Bulk log retrieval requested. Filters: service={service_name}, level={log_level}")
 
+    # Check user role if its admin to see filtered logs
+    user_filter = None if str(current_user.role) == "ADMIN" else current_user.id
+
     # Return the logs list with get logs function
-    return crud_get_logs(db, service_name=service_name, log_level=log_level, limit=limit)
+    return crud_get_logs(db, service_name=service_name, log_level=log_level, limit=limit, user_id=cast(int, user_filter))
 
 @router.get("/{log_id}", response_model=LogResponse)
 async def read_log(
@@ -128,8 +131,10 @@ async def read_log(
     # Log retrieval in Sentinel's logger
     logger.info(f"Single log retrieval requested for ID: {log_id}")
 
+    user_filter = None if str(current_user.role) == "ADMIN" else current_user.id
+
     # Get log from the database
-    db_log = crud_get_logs_by_id(db, log_id=log_id)
+    db_log = crud_get_logs_by_id(db, log_id=log_id, user_id=cast(int, user_filter))
     
     # Check if log exists
     if db_log is None:
