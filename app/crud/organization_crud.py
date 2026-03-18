@@ -1,5 +1,5 @@
 """
-Sentinel API CRUD operations for users.
+Sentinel API CRUD operations for organizations.
 
 This module implements the logic for interacting with the database,
 including users register and log in.
