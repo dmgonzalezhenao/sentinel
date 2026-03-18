@@ -21,6 +21,10 @@ Desarrollar una infraestructura de observabilidad "AI-Ready" capaz de centraliza
 | **RF-12** | Autenticación JWT | El sistema debe emitir tokens de acceso seguros para validar la identidad de los clientes. | ✅ |
 | **RF-13** | Protección de rutas | Los endpoints de ingesta y consulta deben ser accesibles solo para usuarios autenticados. | ✅ |
 | **RF-14** | Relación Log-Usuario | Cada log guardado debe estar vinculado obligatoriamente al ID del usuario/servicio que lo generó. | ✅ |
+| **RF-15** | Gestión de Organizaciones | Capacidad de crear entidades "Organization" para agrupar múltiples usuarios y servicios. | 🏗️ |
+| **RF-16** | Aislamiento Multi-tenant | Los logs deben estar vinculados a una Organización; un usuario solo accede a datos de su propia entidad. | 🏗️ |
+| **RF-17** | Visibilidad Compartida | El rol VIEWER debe poder consultar logs generados por cualquier SERVICE de su misma organización. | 🏗️ |
+| **RF-18** | Super-Admin Access | Rol con privilegios globales para visualizar logs de todas las organizaciones con fines de soporte. | 🏗️ |
 
 ## 3. Requerimientos No Funcionales (RNF)
 
@@ -32,6 +36,9 @@ Desarrollar una infraestructura de observabilidad "AI-Ready" capaz de centraliza
 | **RNF-04** | Seguridad de Acceso | Validación de identidad mediante JWT para servicios autorizados. | ✅ |
 | **RNF-05** | Modularidad | La API debe usar APIRouter para mantener una separación clara de responsabilidades (Separation of Concerns). | ✅ |
 | **RNF-06** | Caducidad de Tokens | Los tokens de acceso deben tener un tiempo de vida (TTL) configurable por seguridad. | ✅ |
+| **RNF-07** | Privacidad de Capa de Datos | Garantizar mediante filtrado SQL (WHERE clause) que no exista fuga de datos entre organizaciones. | 🏗️ |
+| **RNF-08** | Indexación de Tenant | La columna organization_id debe estar indexada en PostgreSQL para optimizar consultas masivas. | 🏗️ |
+| **RNF-09** | Integridad Referencial | Uso de Foreign Keys estrictas para asegurar que un log no quede huérfano de organización. | 🏗️ |
 
 ## 4. Definición del Contrato (Data Schema)
 
