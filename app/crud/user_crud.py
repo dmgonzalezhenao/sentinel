@@ -7,8 +7,8 @@ including users register and log in.
 # Import session object to access the database
 from sqlalchemy.orm import Session
 
-# Import User class (users table from database)
-from app.database.models import User
+# Import User and Organization classes (users and organizations tables from database)
+from app.database.models import User, Organization
 
 # Import Pydantic schemas for users register and log in
 from app.schemas.user_schemas import UserCreate, UserResponse
@@ -57,6 +57,17 @@ def create_user(db: Session, user: UserCreate) -> User:
     """
     Function that creates a new user in database with its hashed password.
     """
+    # Get organization from new user
+    org = db.query(Organization).filter(
+        Organization.id == user.organization_id, 
+        Organization.is_active == True
+    ).first()
+
+    # Validate organization exists
+    if not org:
+        logger.error(f"CRUD: Cannot create user. Organization {user.organization_id} not found or inactive.")
+        raise ValueError("Invalid or inactive organization")
+    
     # Hash password
     hashed_password = get_password_hash(user.password)
 
@@ -65,7 +76,8 @@ def create_user(db: Session, user: UserCreate) -> User:
         username=user.username, 
         email=user.email,
         hashed_password=hashed_password,
-        is_active=True
+        is_active=True,
+        organization_id=user.organization_id
     )
 
     try: 
