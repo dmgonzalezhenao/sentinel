@@ -33,7 +33,18 @@ if DATABASE_URL is None:
 
 # Create the SQLAlchemy engine. 
 # 'pool_pre_ping' ensures the connection is still valid before use.
-engine = create_engine(DATABASE_URL, pool_pre_ping=True)
+# pool_size is the min number of connections opened by default
+# max_overfloe is the max number of connections opened in peak
+# pool_timeout defines 30 seconds as timeout when all connections are in use
+# pool_recycle refresh connections every 30 minutes
+engine = create_engine(
+    DATABASE_URL, 
+    pool_pre_ping=True,
+    pool_size=10,           
+    max_overflow=20,      
+    pool_timeout=30,      
+    pool_recycle=1800
+)
 
 # SessionLocal will be used to create a new database session for each request
 # Autocommit as false ensures that data won't be modified until everything goes good and there's no
