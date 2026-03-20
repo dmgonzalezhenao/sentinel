@@ -25,8 +25,8 @@ from app.database.config import get_db
 # Import dependencies to handle RBAC
 from app.api.devs import get_current_user, RoleChecker
 
-# Import Log and User database models for type hinting
-from app.database.models import Log, User
+# Import database models for type hinting
+from app.database.models import Log, User, Organization
 
 # Import logger object for sentinel's logging
 from app.core.logger import logger
@@ -39,7 +39,7 @@ from sqlalchemy.orm import Session
 router = APIRouter(prefix="/logs", tags=["Logs"])
 
 @router.post("/", status_code=201, response_model=LogResponse)
-async def ingest_log(
+def ingest_log(
     log: Annotated[LogCreate, Body(description="The log data to be ingested")], 
     db: Session = Depends(get_db),
     current_user: User = Depends(RoleChecker(["ADMIN", "SERVICE"]))
@@ -64,10 +64,10 @@ async def ingest_log(
     logger.info(f"Service '{log.service_name}' (User ID: {current_user.id}) is ingesting a log.")
 
     # Persist the validated log and return the database record
-    return crud_save_log(db=db, log_data=log, user_id=cast(int, current_user.id))
+    return crud_save_log(db=db, log_data=log, current_user=current_user)
 
 @router.get("/", response_model=list[LogResponse])
-async def read_logs(
+def read_logs(
     db: Session = Depends(get_db),
     service_name: Annotated[str | None, Query(max_length=50)] = None,
     log_level: Annotated[LogLevel | None, Query()] = None,
@@ -83,7 +83,8 @@ async def read_logs(
     Args:
         service_name (str, optional): The name of the service that generated the log.
         log_level (str, optional): The severity level of the log (e.g., INFO, ERROR).
-        limit (int): Maximum number of log records to return (Default: 10, Max: 100).
+        limit (int, optional): Maximum number of log records to return (Default: 10, Max: 100).
+        user_id (int, optional): Filter by user's id (The user that saved the log).
         db (Session): Database session dependency.
         current_user (User): Authenticated user with VIEWER or ADMIN role.
 
@@ -97,14 +98,18 @@ async def read_logs(
     # Log read logs in Sentinel's logger
     logger.info(f"Bulk log retrieval requested. Filters: service={service_name}, level={log_level}")
 
-    # Check user role if its admin to see filtered logs
-    user_filter = None if str(current_user.role) == "ADMIN" else current_user.id
-
     # Return the logs list with get logs function
-    return crud_get_logs(db, service_name=service_name, log_level=log_level, limit=limit, user_id=cast(int, user_filter))
+    return crud_get_logs(
+        db, 
+        current_user=current_user, 
+        service_name=service_name, 
+        log_level=log_level, 
+        limit=limit, 
+        user_id=cast(int, current_user.id)
+    )
 
 @router.get("/{log_id}", response_model=LogResponse)
-async def read_log(
+def read_log(
     log_id: Annotated[int, Path(ge=1, description="The unique ID of the log record")],
     db: Session = Depends(get_db),
     current_user: User = Depends(RoleChecker(["ADMIN", "VIEWER"]))
@@ -131,10 +136,8 @@ async def read_log(
     # Log retrieval in Sentinel's logger
     logger.info(f"Single log retrieval requested for ID: {log_id}")
 
-    user_filter = None if str(current_user.role) == "ADMIN" else current_user.id
-
     # Get log from the database
-    db_log = crud_get_logs_by_id(db, log_id=log_id, user_id=cast(int, user_filter))
+    db_log = crud_get_logs_by_id(db, current_user=current_user, log_id=log_id)
     
     # Check if log exists
     if db_log is None:
