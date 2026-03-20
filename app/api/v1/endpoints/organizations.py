@@ -41,7 +41,7 @@ router = APIRouter(prefix="/organizations", tags=["Organizations"])
 allow_admin = RoleChecker(["ADMIN"])
 
 @router.post("/", status_code=201, response_model=OrganizationResponse, dependencies=[Depends(allow_admin)])
-async def register_organization(
+def register_organization(
     organization_data: Annotated[OrganizationCreate, Body(description="The organization data for register")],
     db: Session = Depends(get_db)) -> Organization:
     """
@@ -74,7 +74,7 @@ async def register_organization(
     return crud_create_organization(db=db, organization=organization_data)
 
 @router.get("/{slug}", response_model=OrganizationResponse)
-async def get_organization(
+def get_organization(
     slug: str,
     db: Session = Depends(get_db),
     current_user: User = Depends(RoleChecker(["ADMIN", "VIEWER"]))
