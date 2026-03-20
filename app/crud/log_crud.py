@@ -7,7 +7,8 @@ based on service identifiers and severity levels.
 """
 
 # Import session object to access the database
-from sqlalchemy.orm import Session
+# Import joinedload to make joins automatically
+from sqlalchemy.orm import Session, joinedload
 
 # Import Log and User classes (logs and users tables from database)
 from app.database.models import Log, User
@@ -81,8 +82,11 @@ def get_logs(
         f"Filters -> user_filter: {user_id}, service: {service_name}, level: {log_level}"
     )
 
-    # Prepares query for the database (SELECT * FROM logs)
-    query = db.query(Log)
+    # Prepares query with Eager Loading to avoid N+1
+    query = db.query(Log).options(
+        joinedload(Log.author),     
+        joinedload(Log.organization) 
+    )
 
     # Check user's role for filtering
     if str(current_user.role) != "ADMIN":
