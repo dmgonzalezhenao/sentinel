@@ -4,6 +4,9 @@ Sentinel API CRUD operations for organizations.
 This module implements the logic for interacting with the database,
 including users register and log in.
 """
+# Import or_ to make comparations with SQL
+from sqlalchemy import or_
+
 # Import session object to access the database
 from sqlalchemy.orm import Session
 
@@ -55,10 +58,30 @@ def create_organization(db: Session, organization: OrganizationCreate) -> Organi
         # Raise error to main
         raise e
 
-def get_organization_by_slug(db: Session, slug: str) -> Organization | None:
+def get_organization(db: Session, name: str | None = None, slug: str | None = None) -> Organization | None:
     """
-    Function that searches a organization by its slug.
-    Useful for validations and for API paths.
+    Function that searches a organization by its name or its slug.
+    It accepts both optional data.
     """
-    # Return Organization object or None
-    return db.query(Organization).filter(Organization.slug == slug).first()
+    # Prepare query
+    query = db.query(Organization)
+
+    # Check if both data is provided
+    if slug and name:
+        # Special case to check if anyone exists
+        query = query.filter(or_(Organization.slug == slug, Organization.name == name))
+
+    # Filter by slug
+    elif slug:
+        query = query.filter(Organization.slug == slug)
+
+    # Filter by name
+    elif name:
+        query = query.filter(Organization.name == name)
+
+    # Return None if there's no provided data
+    else:
+        return None
+
+    # Return query
+    return query.first()
