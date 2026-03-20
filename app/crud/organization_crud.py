@@ -67,17 +67,17 @@ def get_organization(db: Session, name: str | None = None, slug: str | None = No
     query = db.query(Organization)
 
     # Check if both data is provided
-    if slug and name:
+    if slug is not None and name is not None:
         # Special case to check if anyone exists
-        query = query.filter(or_(Organization.slug == slug, Organization.name == name))
+        query = query.filter(or_(Organization.slug.is_(slug), Organization.name.is_(slug)))
 
     # Filter by slug
-    elif slug:
-        query = query.filter(Organization.slug == slug)
+    elif slug is not None:
+        query = query.filter(Organization.slug.is_(slug))
 
     # Filter by name
-    elif name:
-        query = query.filter(Organization.name == name)
+    elif name is not None:
+        query = query.filter(Organization.name.is_(name))
 
     # Return None if there's no provided data
     else:
