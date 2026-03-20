@@ -86,8 +86,8 @@ class Log(Base):
     timestamp = Column(DateTime(timezone=True), server_default=func.now())
 
     # Create foreign keys that reference user and organization
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
-    organization_id = Column(Integer, ForeignKey("organizations.id"), nullable=False)
+    user_id = Column(Integer, ForeignKey("users.id"), index=True, nullable=False)
+    organization_id = Column(Integer, ForeignKey("organizations.id"), index=True, nullable=False)
 
     # Optimize relationships to log's organization and log's author
     organization = relationship("Organization", back_populates="logs")
