@@ -41,5 +41,8 @@ env/
 # Ignore persistent database data if mapped to a local folder
 postgres_data/
 
+# Load tests and temporal scripts
+tests_sentinel/
+
 # --- Logs ---
 *.log
