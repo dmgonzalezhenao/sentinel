@@ -44,8 +44,8 @@ router = APIRouter(prefix="/users", tags=["Users"])
 allow_admin = RoleChecker(["ADMIN"])
 
 @router.post("/", status_code=201, response_model=UserResponse, dependencies=[Depends(allow_admin)])
-async def register_user(
-    user_data: Annotated[UserCreate, Body(description="The user data for registration.")], 
+def register_user(
+    user_data: Annotated[UserCreate, Body(description="The user data for register.")], 
     db: Session = Depends(get_db)) -> User:
     """
     Register a new user in the Sentinel system.
@@ -72,7 +72,7 @@ async def register_user(
 
     # Raise error if user already exists
     if existing_user:
-        raise HTTPException(status_code=400, detail="User already exists")
+        raise HTTPException(status_code=409, detail="User already exists")
     
     # Validates the input and persists the user record
     return crud_create_user(db=db, user=user_data)
