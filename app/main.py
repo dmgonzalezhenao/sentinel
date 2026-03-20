@@ -11,7 +11,7 @@ from fastapi import FastAPI, Depends
 from app.core.config import settings
 
 # Import endpoints routers
-from app.api.v1.endpoints import logs, users, auth
+from app.api.v1.endpoints import logs, users, organizations, auth
 
 # Import function to create a database session
 from app.database.config import get_db
@@ -34,9 +34,10 @@ app = FastAPI(
     version=settings.VERSION
 )
 
-# Include endpoints from log and user routers
+# Include endpoints from routers
 app.include_router(logs.router, prefix="/api/v1")
 app.include_router(users.router, prefix="/api/v1")
+app.include_router(organizations.router, prefix="/api/v1")
 app.include_router(auth.router, prefix="/api/v1")
 
 # --- Lifecycle logs ---

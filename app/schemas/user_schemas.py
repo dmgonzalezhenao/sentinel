@@ -14,7 +14,7 @@ from pydantic import BaseModel, Field, EmailStr, ConfigDict
 # Import enum and datetime to put them  into the new class
 from enum import Enum
 from datetime import datetime, timezone
-from typing import Any
+from typing import Any, Optional
 
 # Enum for User role
 class UserRole(str, Enum):
@@ -128,17 +128,9 @@ class UserResponse(UserBase):
     )
 
     # Return timestamps from database
-    created_at: datetime = Field(
-        # Description and examples for documentation
-        description="The exact UTC moment the user was created.",
-        examples=["2024-03-20T10:00:00Z"]
-    )
+    created_at: Optional[datetime] = None
     
-    updated_at: datetime = Field(
-        # Description and examples for documentation
-        description="The last time any field in this user record was changed.",
-        examples=["2024-03-21T15:30:00Z"]
-    )
+    updated_at: Optional[datetime] = None
 
     # Configures Pydantic to work with SQLAlchemy models
     model_config = ConfigDict(from_attributes=True)

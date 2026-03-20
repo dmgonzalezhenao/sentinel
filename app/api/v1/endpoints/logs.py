@@ -72,6 +72,7 @@ def read_logs(
     service_name: Annotated[str | None, Query(max_length=50)] = None,
     log_level: Annotated[LogLevel | None, Query()] = None,
     limit: Annotated[int, Query(ge=1, le=100)] = 10,
+    user_id: Annotated[int | None, Query()] = None,
     current_user: User = Depends(RoleChecker(["ADMIN", "VIEWER"]))
     ) -> list[Log]:
     """
@@ -105,7 +106,7 @@ def read_logs(
         service_name=service_name, 
         log_level=log_level, 
         limit=limit, 
-        user_id=cast(int, current_user.id)
+        user_id=user_id
     )
 
 @router.get("/{log_id}", response_model=LogResponse)
