@@ -25,6 +25,11 @@ Desarrollar una infraestructura de observabilidad "AI-Ready" capaz de centraliza
 | **RF-16** | Aislamiento Multi-tenant | Los logs deben estar vinculados a una Organización; un usuario solo accede a datos de su propia entidad. | ✅ |
 | **RF-17** | Visibilidad Compartida | El rol VIEWER debe poder consultar logs generados por cualquier SERVICE de su misma organización. | ✅ |
 | **RF-18** | Super-Admin Access | Rol con privilegios globales para visualizar logs de todas las organizaciones con fines de soporte. | ✅ |
+| **RF-19** | Clasificación por NLP | El sistema debe categorizar el mensaje del log (ej. DB, Network, Auth) usando modelos de Machine Learning. | 🏗️ |
+| **RF-20** | Detección de Anomalías | Identificación de picos inusuales en el volumen de logs mediante análisis estadístico/ML. | 🏗️ |
+| **RF-21** | Scoring de Riesgo | Asignación automática de un nivel de criticidad (0-100) basado en patrones detectados por la IA. | 🏗️ |
+| **RF-22** | Motor de Alertas | Disparo de notificaciones (Webhooks/Email) cuando se detecte un Risk Score alto o una anomalía. | 🏗️ |
+| **RF-23** | Dashboard Analítico | Endpoint de agregación para visualizar métricas de salud, top de errores y predicciones de IA. | 🏗️ |
 
 ## 3. Requerimientos No Funcionales (RNF)
 
@@ -39,6 +44,10 @@ Desarrollar una infraestructura de observabilidad "AI-Ready" capaz de centraliza
 | **RNF-07** | Privacidad de Capa de Datos | Garantizar mediante filtrado SQL (WHERE clause) que no exista fuga de datos entre organizaciones. | ✅ |
 | **RNF-08** | Indexación de Tenant | La columna organization_id debe estar indexada en PostgreSQL para optimizar consultas masivas. | ✅ |
 | **RNF-09** | Integridad Referencial | Uso de Foreign Keys estrictas para asegurar que un log no quede huérfano de organización. | ✅ |
+| **RNF-10** | Inferencia Asíncrona | El análisis de IA debe ejecutarse en BackgroundTasks para no penalizar el tiempo de respuesta del posteo. | 🏗️ |
+| **RNF-11** | Observabilidad de Performance | Medición del tiempo de procesamiento mediante Middleware e inyección en headers (X-Process-Time). | 🏗️ |
+| **RNF-12** | Serialización de Modelos | Los modelos de IA deben cargarse desde archivos .pkl o .joblib para facilitar actualizaciones sin redespacho. | 🏗️ |
+| **RNF-13** | Aislamiento de Inferencia | Los modelos deben procesar datos respetando el contexto de la organización para evitar sesgos cruzados. | 🏗️ |
 
 ## 4. Definición del Contrato (Data Schema)
 
