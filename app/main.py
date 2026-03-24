@@ -4,8 +4,8 @@ Main entry point for the Sentinel API.
 This module initializes the FastAPI application and defines the core routes
 for log ingestion and system health monitoring.
 """
-# Import FastAPI object
-from fastapi import FastAPI, Depends
+# Import FastAPI objects
+from fastapi import FastAPI, Depends, Request, Response
 
 # Import settings object 
 from app.core.config import settings
@@ -18,6 +18,9 @@ from app.database.config import get_db
 
 # Import utils logic from database to check connection
 from app.database.utils import check_db_connection
+
+# Import time object to calculate response time (middleware)
+import time
 
 # Import types for static analysis and type hinting
 from datetime import datetime, timezone
@@ -33,6 +36,41 @@ app = FastAPI(
     description="AI-Ready Infrastructure for Log Observability and Anomaly Detection.",
     version=settings.VERSION
 )
+
+@app.middleware("http")
+async def add_process_time_header(request: Request, call_next) -> Response:
+    """
+    Middleware for request latency measurement and observability.
+
+    Calculates the elapsed time from when the request enters the system 
+    until a response is generated, injecting the result into the 
+    HTTP headers for performance monitoring (RNF-11).
+
+    Args:
+        request (Request): The incoming request object.
+        call_next (Callable): The function that processes the request to the next 
+                            node in the application (endpoint or middleware).
+
+    Returns:
+        Response: The processed response including the 'X-Process-Time' header.
+    """
+    # Start counting time
+    start_time = time.time()
+    
+    # Process petition and await
+    response = await call_next(request)
+    
+    # Calculate latency after awaiting
+    process_time = time.time() - start_time
+    
+    # Inject in headers
+    response.headers["X-Process-Time"] = f"{process_time:.4f}s"
+    
+    # Log time in Sentinel's logger
+    logger.info(f"Path: {request.url.path} | Latency: {process_time:.4f}s")
+    
+    # Return response to user
+    return response
 
 # Include endpoints from routers
 app.include_router(logs.router, prefix="/api/v1")
@@ -65,7 +103,7 @@ async def shutdown_event() -> None:
 
 
 @app.get("/health", tags=["Monitoring"])
-async def health_check(db: Session = Depends(get_db)) -> dict[str, Any]:
+def health_check(db: Session = Depends(get_db)) -> dict[str, Any]:
     """
     Check the operational status of the API and connection to the database.
     
