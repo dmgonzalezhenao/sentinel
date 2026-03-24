@@ -14,7 +14,13 @@ sys.path.insert(0, os.path.realpath(os.path.join(os.path.dirname(__file__), '..'
 from app.core.config import settings
 
 # Import base model from database models
-from app.database.models import Base
+from app.database.config import Base
+
+# Import database models
+from app.database.models import Log, User, Organization
+
+# Metadata to save database models
+target_metadata = Base.metadata
 
 config = context.config
 
