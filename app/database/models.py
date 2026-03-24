@@ -10,18 +10,22 @@ Relationships:
 - User (1) <---> (N) Logs (Authorship traceability)
 
 Table: logs
---------------------------------------------------------------
-| Column          | Type      | Note                         |
-|-----------------|-----------|------------------------------|
-| id              | Integer   | PK, Autoincrement            |
-| service_name    | String    | Indexed, e.g. 'web-app'      |
-| log_level       | String    | INFO, ERROR, etc.            |
-| message         | String    | Main description             |
-| log_metadata    | JSONB     | Flexible software-specific   |
-| timestamp       | DateTime  | Server default now time      |
-| user_id         | Integer   | FK -> users(id)              |
-| organization_id | Integer   | FK -> organizations(id)      |
---------------------------------------------------------------
+------------------------------------------------------------------------------
+| Column          | Type           | Note                                    |
+|-----------------|----------------|-----------------------------------------|
+| id              | Integer        | PK, Autoincrement                       |
+| service_name    | String         | Indexed, e.g. 'web-app'                 |
+| log_level       | String         | INFO, ERROR, etc.                       |
+| message         | String         | Main description                        |
+| log_metadata    | JSONB          | Flexible software-specific              |
+| timestamp       | DateTime       | Server default now time                 |
+| user_id         | Integer        | FK -> users(id), Indexed                |
+| organization_id | Integer        | FK -> organizations(id), Indexed        |
+| process_time    | Float          | Observability latency (Middleware)      |
+| ai_category     | String         | AI Generated, Indexed, e.g. 'db-error'  |
+| risk_score      | SmallInteger   | AI Generated, Indexed, range = [0, 100] |
+| is_anomaly      | Boolean        | AI Generated, Indexed                   |
+------------------------------------------------------------------------------
 
 Table: users
 ----------------------------------------------------------------------------
@@ -52,7 +56,7 @@ Table: organizations
 """
 
 # Import column object and column types from SQLAlchemy
-from sqlalchemy import Column, Integer, String, DateTime, Boolean, ForeignKey
+from sqlalchemy import Column, Integer, Float, String, DateTime, Boolean, SmallInteger, ForeignKey, CheckConstraint
 
 # Import relationship to optimize joins
 from sqlalchemy.orm import relationship
@@ -92,6 +96,18 @@ class Log(Base):
     # Optimize relationships to log's organization and log's author
     organization = relationship("Organization", back_populates="logs")
     author = relationship("User", back_populates="logs")
+
+    # Sentinel's latency time (middleware)
+    process_time = Column(Float, nullable=True)
+
+    # AI generated data
+    ai_category = Column(String(50), index=True, nullable=True)
+    risk_score = Column(SmallInteger, 
+                        CheckConstraint('risk_score >= 0 AND risk_score <= 100'), 
+                        index=True, 
+                        nullable=True
+                    )
+    is_anomaly = Column(Boolean, index=True, nullable=True, server_default="false")
 
 # Create users class
 class User(Base):
