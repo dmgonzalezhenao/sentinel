@@ -19,6 +19,9 @@ from app.database.config import get_db
 # Import utils logic from database to check connection
 from app.database.utils import check_db_connection
 
+# Import Log object to save process time in database
+from app.database.models import Log
+
 # Import time object to calculate response time (middleware)
 import time
 
@@ -55,14 +58,39 @@ async def add_process_time_header(request: Request, call_next) -> Response:
         Response: The processed response including the 'X-Process-Time' header.
     """
     # Start counting time
-    start_time = time.time()
+    start_time = time.perf_counter()
     
     # Process petition and await
     response = await call_next(request)
     
     # Calculate latency after awaiting
-    process_time = time.time() - start_time
+    process_time = time.perf_counter() - start_time
     
+    # Get log id (For save log)
+    log_id = getattr(request.state, "db_log_id", None)
+
+    # If there's log_id provided (Just for logs creation)
+    if log_id:
+        # Open db session
+        db_gen = get_db()
+        db = next(db_gen)
+        try:
+            # Update process time column
+            db.query(Log).filter(Log.id == log_id).update({"process_time": process_time})
+            db.commit()
+
+            # Log process time injection
+            logger.debug(f"METRICS: Process time {process_time:.4f}s saved for Log ID {log_id}")
+
+        # Log the error and make a rollback
+        except Exception as e:
+            logger.error(f"METRICS_ERROR: Failed to update process_time for Log ID {log_id}. Details: {e}")
+            db.rollback()
+
+        # Close connection
+        finally:
+            db.close()
+        
     # Inject in headers
     response.headers["X-Process-Time"] = f"{process_time:.4f}s"
     
