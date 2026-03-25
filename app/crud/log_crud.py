@@ -71,6 +71,8 @@ def get_logs(
     user_id: int | None = None,
     service_name: str | None = None, 
     log_level: str | None = None, 
+    risk_score: int | None = None,
+    is_anomaly: bool | None = None,
     limit: int = 10
 ) -> list[Log]:
     """
@@ -114,6 +116,16 @@ def get_logs(
         # Filter data by log_level
         query = query.filter(Log.log_level == log_level)
 
+    # If theres risk score provided
+    if risk_score is not None:
+        # Filter data
+        query = query.filter(Log.risk_score == risk_score)
+    
+    # If there's anomaly check provided
+    if is_anomaly is not None:
+        # Filter data
+        query = query.filter(Log.is_anomaly == is_anomaly)
+        
     # Return ordered query
     results = query.order_by(Log.id.desc()).limit(limit).all()
 
