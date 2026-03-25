@@ -8,7 +8,7 @@ CRUD operations for logs.
 
 # Import APIRouter to determine paths as Sentinel endpoints
 # The other objects are for hinting
-from fastapi import APIRouter, Depends, Body, Query, Path, HTTPException
+from fastapi import APIRouter, Depends, Body, Query, Path, HTTPException, Request
 
 # Import Pydantic Logs Schemas
 from app.schemas.log_schemas import LogLevel, LogCreate, LogResponse
@@ -40,6 +40,7 @@ router = APIRouter(prefix="/logs", tags=["Logs"])
 
 @router.post("/", status_code=201, response_model=LogResponse)
 def ingest_log(
+    request: Request,
     log: Annotated[LogCreate, Body(description="The log data to be ingested")], 
     db: Session = Depends(get_db),
     current_user: User = Depends(RoleChecker(["ADMIN", "SERVICE"]))
@@ -63,8 +64,14 @@ def ingest_log(
     # Log the ingestion
     logger.info(f"Service '{log.service_name}' (User ID: {current_user.id}) is ingesting a log.")
 
+    # Get log from database
+    db_log = crud_save_log(db=db, log_data=log, current_user=current_user)
+
+    # Save ID status in petition for middleware
+    request.state.db_log_id = db_log.id
+
     # Persist the validated log and return the database record
-    return crud_save_log(db=db, log_data=log, current_user=current_user)
+    return db_log
 
 @router.get("/", response_model=list[LogResponse])
 def read_logs(
