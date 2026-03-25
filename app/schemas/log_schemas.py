@@ -146,14 +146,14 @@ class LogResponse(LogBase):
         ge=0,
         le=100,
         description="AI-calculated risk level from 0 to 100.",
-        examples=[85]
+        examples=[1, 20, 85]
     )
 
     # A value to flag a a log as a anomaly (e.g. A critical log)
     is_anomaly: bool = Field(
         default=False,
         description="Flag indicating if the log was flagged as an anomaly by the AI.",
-        examples=[True]
+        examples=[True, False]
     )
 
     # Configures Pydantic to work with SQLAlchemy models
