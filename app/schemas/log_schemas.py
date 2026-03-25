@@ -113,15 +113,48 @@ class LogResponse(LogBase):
     )
 
     # User's id (User that created the log)
-    user_id : int = Field(
+    user_id : int | None = Field(
         description="The id of the user that created the log.",
         examples=[1, 105, 2304]
     )
 
     # Organization's id
-    organization_id : int = Field(
+    organization_id : int | None = Field(
         description="The id of the organization that owns the log.",
         examples=[1, 105, 2304]
     )
+
+    # New Observability & AI Fields 
+
+    # Process time (ms)
+    process_time: float | None = Field(
+        default=None,
+        description="The internal processing latency in seconds.",
+        examples=[0.045]
+    )
+
+    # AI classification
+    ai_category: str | None = Field(
+        default=None,
+        description="AI-generated classification of the log content.",
+        examples=["Database Error", "Auth Failure"]
+    )
+
+    # AI generated risk score
+    risk_score: int | None = Field(
+        default=None,
+        ge=0,
+        le=100,
+        description="AI-calculated risk level from 0 to 100.",
+        examples=[85]
+    )
+
+    # A value to flag a a log as a anomaly (e.g. A critical log)
+    is_anomaly: bool = Field(
+        default=False,
+        description="Flag indicating if the log was flagged as an anomaly by the AI.",
+        examples=[True]
+    )
+
     # Configures Pydantic to work with SQLAlchemy models
     model_config = ConfigDict(from_attributes=True)
