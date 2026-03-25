@@ -73,6 +73,8 @@ def read_logs(
     log_level: Annotated[LogLevel | None, Query()] = None,
     limit: Annotated[int, Query(ge=1, le=100)] = 10,
     user_id: Annotated[int | None, Query()] = None,
+    risk_score: Annotated[int | None, Query(ge=0, le=100)] = None,
+    is_anomaly: Annotated[bool | None, Query()] = None,
     current_user: User = Depends(RoleChecker(["ADMIN", "VIEWER"]))
     ) -> list[Log]:
     """
@@ -106,6 +108,8 @@ def read_logs(
         service_name=service_name, 
         log_level=log_level, 
         limit=limit, 
+        risk_score=risk_score,
+        is_anomaly=is_anomaly,
         user_id=user_id
     )
 
