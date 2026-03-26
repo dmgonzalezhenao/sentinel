@@ -40,8 +40,8 @@ class Organization(Base):
     is_active = Column(Boolean, default=True)
 
     # Timestamps for auditing.
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
-    updated_at = Column(DateTime(timezone=True), onupdate=func.now(), server_default=func.now())
+    created_at = Column(DateTime(timezone=True), default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now(), default=func.now())
 
     # Create relationship to optimize queries from organizations to users and logs
     users = relationship("User", back_populates="organization")

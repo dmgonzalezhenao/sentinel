@@ -42,8 +42,8 @@ class User(Base):
     role = Column(String(20), nullable=False, default="VIEWER")
 
     # Timestamps for auditing.
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
-    updated_at = Column(DateTime(timezone=True), onupdate=func.now(), server_default=func.now())
+    created_at = Column(DateTime(timezone=True), default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now(), default=func.now())
 
     # Foreign key to organizations table
     organization_id = Column(Integer, ForeignKey("organizations.id"), nullable=True)
