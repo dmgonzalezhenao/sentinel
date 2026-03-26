@@ -45,4 +45,4 @@ postgres_data/
 tests_sentinel/
 
 # --- Logs ---
-*.log
+logs

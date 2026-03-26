@@ -7,6 +7,10 @@ for log ingestion and system health monitoring.
 # Import FastAPI objects
 from fastapi import FastAPI, Depends, Request, Response
 
+# Import limit for connections
+from anyio.lowlevel import RunVar
+from anyio import CapacityLimiter
+
 # Import settings object 
 from app.core.config import settings
 
@@ -115,6 +119,9 @@ async def startup_event() -> None:
     Returns:
     None
     """
+    # Put capacity limiter to 200 threads
+    RunVar("_default_thread_limiter").set(CapacityLimiter(200))
+    
     # Log startup as info
     logger.info(f"*** Starting {settings.PROJECT_NAME} v{settings.VERSION} ***")
 

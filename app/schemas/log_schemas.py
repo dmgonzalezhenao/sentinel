@@ -21,6 +21,7 @@ class LogLevel(str, Enum):
     Enumeration of allowed log severity levels.
     Inheriting from 'str' ensures the API handles text values correctly.
     """
+    DEBUG = "DEBUG"
     INFO = "INFO"
     WARNING = "WARNING"
     ERROR = "ERROR"

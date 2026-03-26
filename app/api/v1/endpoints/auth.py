@@ -44,7 +44,7 @@ from app.core.logger import logger
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 
 @router.post("/login", response_model=Token, status_code=200)
-async def login(
+def login(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()], 
     db: Session = Depends(get_db)
 ):
