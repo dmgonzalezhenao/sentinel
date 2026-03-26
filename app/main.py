@@ -80,7 +80,7 @@ async def add_process_time_header(request: Request, call_next) -> Response:
             db.commit()
 
             # Log process time injection
-            logger.debug(f"METRICS: Process time {process_time:.4f}s saved for Log ID {log_id}")
+            logger.debug(f"METRICS: Process time {process_time:.4f}ms saved for Log ID {log_id}")
 
         # Log the error and make a rollback
         except Exception as e:
@@ -92,10 +92,10 @@ async def add_process_time_header(request: Request, call_next) -> Response:
             db.close()
         
     # Inject in headers
-    response.headers["X-Process-Time"] = f"{process_time:.4f}s"
+    response.headers["X-Process-Time"] = f"{process_time:.4f}ms"
     
     # Log time in Sentinel's logger
-    logger.info(f"Path: {request.url.path} | Latency: {process_time:.4f}s")
+    logger.info(f"Path: {request.url.path} | Latency: {process_time:.4f}ms")
     
     # Return response to user
     return response
