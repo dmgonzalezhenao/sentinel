@@ -17,7 +17,7 @@ from app.core.config import settings
 from app.database.config import Base
 
 # Import database models
-from app.database.models import Log, User, Organization
+from app.database.models import Log, User, Organization, AIAnalysis, Alert
 
 # Metadata to save database models
 target_metadata = Base.metadata
