@@ -165,3 +165,24 @@ def get_logs_by_id(
 
     # Return log
     return result
+
+def get_multiple_logs(
+    db: Session,
+    current_user: User,
+    limit: int | None = 10000
+) -> list[Log]:
+    """
+    Retrieve a bulk of logs to admin user.
+    Useful for analytics and machine learning.
+    """
+    # Log bulk data in sentinel
+    logger.info(f"CRUD: Admin {current_user.username} requesting a bulk of {limit} logs.")
+
+    # Make query
+    results = db.query(Log).order_by(Log.id.desc()).limit(limit).all()
+
+    # Log result in Sentinel's logger
+    logger.info(f"CRUD: Successfully retrieved {len(results)} log records.")
+
+    # Return result
+    return results
