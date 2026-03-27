@@ -15,7 +15,7 @@ from anyio import CapacityLimiter
 from app.core.config import settings
 
 # Import endpoints routers
-from app.api.v1.endpoints import logs, users, organizations, auth
+from app.api.v1.endpoints import logs, users, organizations, auth, reports
 
 # Import function to create a database session
 from app.database.config import get_db
@@ -109,6 +109,7 @@ app.include_router(logs.router, prefix="/api/v1")
 app.include_router(users.router, prefix="/api/v1")
 app.include_router(organizations.router, prefix="/api/v1")
 app.include_router(auth.router, prefix="/api/v1")
+app.include_router(reports.router, prefix="/api/v1")
 
 # --- Lifecycle logs ---
 @app.on_event("startup")
