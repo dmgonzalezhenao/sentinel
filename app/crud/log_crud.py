@@ -21,8 +21,19 @@ from app.core.logger import logger
 
 def create_log(db: Session, log_data: LogCreate, current_user: User) -> Log:
     """
-    Function to create a SQLAlchemy Log object using the data
-    from log_data and insert log in logs table in the database.
+    Creates and persists a new Log entry in the database.
+
+    Args:
+        db (Session): The database session object.
+        log_data (LogCreate): Pydantic schema containing the log details (service, level, etc.).
+        current_user (User): The user object representing the entity creating the log.
+
+    Returns:
+        Log: The newly created SQLAlchemy Log object with its generated ID and timestamp.
+
+    Raises:
+        Exception: If there is a database connection error or constraint violation. 
+                 Performs a rollback to ensure data integrity.
     """
     # Dump data from log_data and create the Log object
     db_log = Log(
@@ -76,7 +87,23 @@ def get_logs(
     limit: int = 10
 ) -> list[Log]:
     """
-    Retrieve a collection of logs with optional filtering and pagination.
+    Retrieves a collection of logs with multi-parameter filtering and security isolation.
+
+    This function automatically restricts data access based on the user's role. 
+    Non-admin users can only see logs from their own organization.
+
+    Args:
+        db (Session): The database session object.
+        current_user (User): The user requesting the logs.
+        user_id (int, optional): Filter logs by a specific author ID.
+        service_name (str, optional): Filter logs by the source service name.
+        log_level (str, optional): Filter by severity (INFO, DEBUG, ERROR, etc.).
+        risk_score (int, optional): Filter by a specific security risk value.
+        is_anomaly (bool, optional): Filter by anomaly detection flag.
+        limit (int): Maximum number of records to return. Defaults to 10.
+
+    Returns:
+        list[Log]: A list of Log objects ordered by ID descending (most recent first).
     """
     # Log database query
     logger.info(
@@ -141,8 +168,17 @@ def get_logs_by_id(
     log_id: int
 ) -> Log | None:
     """
-    Retrieve a specific log by its id. Restricted to organization
-    for viewers.
+    Retrieves a single log record by its unique identifier.
+
+    Non-admin users are restricted to fetching logs within their own organization.
+
+    Args:
+        db (Session): The database session object.
+        current_user (User): The user requesting the specific log.
+        log_id (int): The primary key ID of the log to retrieve.
+
+    Returns:
+        Log | None: The Log object if found and authorized, otherwise None.
     """
     # Log query to Sentinel
     logger.info(f"CRUD: User {current_user.email} attempting to fetch Log ID: {log_id}")
@@ -172,8 +208,18 @@ def get_multiple_logs(
     limit: int | None = 10000
 ) -> list[Log]:
     """
-    Retrieve a bulk of logs to admin user.
-    Useful for analytics and machine learning.
+    Retrieves a high-volume bulk of logs for global administrative purposes.
+
+    Designed for administrative oversight, analytics, and Machine Learning training. 
+    It bypasses organizational filters to provide a global view of the infrastructure.
+
+    Args:
+        db (Session): The database session object.
+        current_user (User): The admin user requesting the bulk data.
+        limit (int, optional): Maximum number of logs to fetch. Defaults to 10000.
+
+    Returns:
+        list[Log]: A list of Log objects from across all organizations.
     """
     # Log bulk data in sentinel
     logger.info(f"CRUD: Admin {current_user.username} requesting a bulk of {limit} logs.")
