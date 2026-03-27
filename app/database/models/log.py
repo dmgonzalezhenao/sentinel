@@ -25,7 +25,7 @@ class Log(Base):
     Attributes:
         id (int): Primary key, auto-incrementing unique identifier.
         service_name (str): Name of the microservice or application originating the log.
-        log_level (str): Event severity level (e.g., INFO, WARN, ERROR, CRITICAL).
+        log_level (str): Event severity level (e.g., DEBUG, INFO, WARN, ERROR, CRITICAL).
         message (str): The raw descriptive content of the log entry.
         log_metadata (dict): Flexible context stored as PostgreSQL JSONB for schema-less data.
         timestamp (datetime): Server-side UTC record of when the log was received.
