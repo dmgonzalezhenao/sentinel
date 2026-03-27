@@ -51,3 +51,4 @@ class User(Base):
     # Define relationship to organization and logs as "author"
     organization = relationship("Organization", back_populates="users")
     logs = relationship("Log", back_populates="author", uselist=True)
+    alerts = relationship("Alert", back_populates="analyst", uselist=True)

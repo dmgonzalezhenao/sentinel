@@ -41,7 +41,7 @@ class Settings(BaseSettings):
     # BaseSettings will automatically search those values in
     # the project files
     DATABASE_URL: str = Field(validation_alias="DATABASE_URL")
-    VERSION: str = "0.6.6"
+    VERSION: str = "0.7.0"
     PROJECT_NAME: str = "Sentinel API"
     SECRET_KEY: str = Field(validation_alias="SECRET_KEY")
     ALGORITHM: str = Field(default="HS256")

@@ -50,3 +50,4 @@ class AIAnalysis(Base):
 
     # Optimize relationship's to log's analysis
     log = relationship("Log", back_populates="ai_analyses")
+    alert = relationship("Alert", back_populates="ai_analysis", uselist=False)
