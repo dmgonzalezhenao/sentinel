@@ -11,8 +11,11 @@ Relationships:
 - Organization (1) <---> (N) Users (Admin, Viewer, Service)
 - Organization (1) <---> (N) Logs (Enforced Isolation)
 - User (1) <---> (N) Logs (Authorship traceability)
+- Log (1) <---> (N) AIAnalysis (Model inference results)
+- AIAnalysis (1) <---> (1) Alert (Incident escalation)
+- User (Analyst) (1) <---> (N) Alert (Assignment & Resolution)
 
-Table: logs
+Table: logs (Telemetry Data)
 ------------------------------------------------------------------------------
 | Column          | Type           | Note                                    |
 |-----------------|----------------|-----------------------------------------|
@@ -23,11 +26,36 @@ Table: logs
 | log_metadata    | JSONB          | Flexible software-specific              |
 | timestamp       | DateTime       | Server default now time                 |
 | user_id         | Integer        | FK -> users(id), Indexed                |
-| organization_id | Integer        | FK -> organizations(id), Indexed        |
+| organization_id | Integer        | FK -> organizations(id), Indexed         |
 | process_time    | Float          | Observability latency (Middleware)      |
-| ai_category     | String         | AI Generated, Indexed, e.g. 'db-error'  |
-| risk_score      | SmallInteger   | AI Generated, Indexed, range = [0, 100] |
-| is_anomaly      | Boolean        | AI Generated, Indexed                   |
+------------------------------------------------------------------------------
+
+Table: ai_analyses (Intelligence Layer)
+------------------------------------------------------------------------------
+| Column            | Type           | Note                                  |
+|-------------------|----------------|---------------------------------------|
+| id                | Integer        | PK, Autoincrement                     |
+| log_id            | Integer        | FK -> logs(id), Indexed               |
+| model_version     | String         | e.g. 'isolation-forest-v1'            |
+| prediction_score  | Float          | Range [0.0, 1.0], CheckConstraint     |
+| is_anomaly        | Boolean        | Binary classification flag            |
+| inference_time_ms | Float          | Performance metric (Latency)          |
+| analysis_details  | JSONB          | Model-specific reasoning (Optional)   |
+| created_at        | DateTime       | Inference timestamp                   |
+------------------------------------------------------------------------------
+
+Table: alerts (Operational Layer)
+------------------------------------------------------------------------------
+| Column          | Type           | Note                                    |
+|-----------------|----------------|-----------------------------------------|
+| id              | Integer        | PK, Autoincrement                       |
+| analysis_id     | Integer        | FK -> ai_analyses(id), Unique           |
+| severity        | String         | LOW, MEDIUM, HIGH, CRITICAL             |
+| status          | String         | PENDING, RESOLVED, FALSE_POSITIVE       |
+| assigned_to     | Integer        | FK -> users(id), Nullable (Analyst)     |
+| notes           | String         | Human-provided resolution context       |
+| created_at      | DateTime       | Alert trigger timestamp                 |
+| resolved_at     | DateTime       | Closure timestamp (Nullable)            |
 ------------------------------------------------------------------------------
 
 Table: users
@@ -61,6 +89,8 @@ Table: organizations
 from .log import Log
 from .user import User
 from .organization import Organization
+from .ai_analysis import AIAnalysis
+from .alerts import Alert
 
 # Expose models
-__all__ = ["Log", "User", "Organization"]
+__all__ = ["Log", "User", "Organization", "AIAnalysis", "Alert"]
