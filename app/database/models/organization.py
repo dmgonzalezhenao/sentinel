@@ -44,5 +44,5 @@ class Organization(Base):
     updated_at = Column(DateTime(timezone=True), onupdate=func.now(), default=func.now())
 
     # Create relationship to optimize queries from organizations to users and logs
-    users = relationship("User", back_populates="organization")
-    logs = relationship("Log", back_populates="organization")
+    users = relationship("User", back_populates="organization", uselist=True)
+    logs = relationship("Log", back_populates="organization", uselist=True)

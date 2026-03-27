@@ -1,5 +1,5 @@
 # Import column object and column types from SQLAlchemy
-from sqlalchemy import Column, Integer, Float, String, DateTime, Boolean, SmallInteger, ForeignKey, CheckConstraint
+from sqlalchemy import Column, Integer, Float, String, DateTime, ForeignKey
 
 # Import relationship to optimize joins
 from sqlalchemy.orm import relationship
@@ -32,9 +32,6 @@ class Log(Base):
         user_id (int): Reference to the authenticated user who initiated the request.
         organization_id (int): Reference for data isolation in multi-tenant environments.
         process_time (float): Processing latency measured in seconds.
-        ai_category (str): NLP-based thematic classification (e.g., 'auth_failure', 'db_timeout').
-        risk_score (int): Scaled criticality metric ranging from 0 to 100.
-        is_anomaly (bool): Statistical flag identifying deviant system behavior.
     """
 
     # Define table's name
@@ -52,18 +49,10 @@ class Log(Base):
     user_id = Column(Integer, ForeignKey("users.id"), index=True, nullable=True)
     organization_id = Column(Integer, ForeignKey("organizations.id"), index=True, nullable=True)
 
-    # Optimize relationships to log's organization and log's author
+    # Optimize relationships to organization, author and ai analyses
     organization = relationship("Organization", back_populates="logs")
     author = relationship("User", back_populates="logs")
+    ai_analyses = relationship("AIAnalysis", back_populates="log", uselist=True)
 
     # Sentinel's latency time (middleware)
     process_time = Column(Float, nullable=True)
-
-    # AI generated data
-    ai_category = Column(String(50), index=True, nullable=True)
-    risk_score = Column(SmallInteger, 
-                        CheckConstraint('risk_score >= 0 AND risk_score <= 100'), 
-                        index=True, 
-                        nullable=True
-                    )
-    is_anomaly = Column(Boolean, index=True, nullable=True, server_default="false")
