@@ -34,7 +34,7 @@ from sqlalchemy.orm import Session
 from datetime import datetime
 from typing import Annotated
 
-router = APIRouter()
+router = APIRouter(prefix="/reports", tags=["Reports"])
 
 @router.get("/export-csv")
 def export_logs_to_csv(
