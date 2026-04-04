@@ -77,7 +77,7 @@ def export_logs_to_csv(
         yield "\ufeff"
 
         # Define headers for ML
-        writer.writerow(["ID", "Service name", "Log Level", "Message", "Risk Score", "Is Anomaly", "CPU Spike", "Timestamp"])
+        writer.writerow(["ID", "Service name", "Log Level", "Message", "Risk Score", "Is Anomaly", "Timestamp", "Process Time"])
         
         # Await to access value
         yield output.getvalue()
@@ -110,8 +110,8 @@ def export_logs_to_csv(
                 safe_message,
                 meta.get("risk_score", 0),
                 1 if meta.get("is_anomaly") else 0,
-                meta.get("cpu_spike", 0.0),
-                ts_str
+                ts_str,
+                log.process_time
             ])
             yield output.getvalue()
             output.seek(0)
