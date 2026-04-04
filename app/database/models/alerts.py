@@ -49,4 +49,4 @@ class Alert(Base):
 
     # Optimize relationships
     ai_analysis = relationship("AIAnalysis", back_populates="alert")
-    analyst = relationship("User", back_populates="alert")
+    analyst = relationship("User", back_populates="alerts")
