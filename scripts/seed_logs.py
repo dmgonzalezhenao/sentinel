@@ -14,7 +14,7 @@ from typing import TypedDict, List
 # 1. Configuration constants for the simulation
 API_BASE_URL = "http://127.0.0.1:8000/api/v1"
 TOTAL_LOGS = 10000
-CONCURRENCY_LIMIT = 10  # Cambie a 25 porque tengo entendido que Postgre no permite màs de 30 o no se si era Neon
+CONCURRENCY_LIMIT = 10  # I changed to 10 due to Neon limit
 ANOMALY_RATE = 0.05      # 5% of logs will be random anomalies
 
 # 2. Hardcoded service credentials provided for the simulation
