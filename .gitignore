@@ -46,3 +46,8 @@ tests_sentinel/
 
 # --- Logs ---
 logs
+
+# -- Data --
+data/raw/*.csv
+!data/raw/
+!data/processed/
