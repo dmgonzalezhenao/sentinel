@@ -22,7 +22,22 @@ MIN_DATE = datetime.strptime("2026-02-24 18:15:19", "%Y-%m-%d %H:%M:%S")
 MAX_DATE = datetime.strptime("2026-03-26 18:51:49", "%Y-%m-%d %H:%M:%S")
 TOTAL_SECONDS_RANGE = int((MAX_DATE - MIN_DATE).total_seconds())
 
-def inject_brute_force():
+def inject_brute_force() -> None:
+    """
+    Simulates brute force attack anomalies by injecting bursts of failed logins.
+
+    This function reads an existing log dataset and appends multiple 'attack bursts'.
+    Each burst consists of 30 to 60 failed authentication attempts occurring 
+    within milliseconds of each other. The generated logs are assigned high 
+    risk scores and specific process times to distinguish them from normal traffic.
+    Finally, it re-indexes and sorts the entire dataset chronologically.
+
+    Returns:
+        None
+    
+    Raises:
+        FileNotFoundError: If the source CSV file at FILE_PATH does not exist.
+    """
     try:
         # Create a DataFrame with Sentinel logs data
         df = pd.read_csv(FILE_PATH)
