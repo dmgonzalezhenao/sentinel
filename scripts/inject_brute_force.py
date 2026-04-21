@@ -10,7 +10,6 @@ import pandas as pd
 
 # Imports for hinting
 import random
-import uuid
 from datetime import datetime, timedelta
 
 # Define file paths
@@ -94,6 +93,7 @@ def inject_brute_force() -> None:
         df_final.to_csv(OUTPUT_PATH, index=False)
         print(f"Phase 1 completed: Injected {len(df_attack)} brute force logs.")
 
+    # Exception if there's no file found
     except FileNotFoundError:
         print("Ensure you have file in data/raw")
 
