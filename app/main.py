@@ -68,7 +68,7 @@ async def add_process_time_header(request: Request, call_next) -> Response:
     response = await call_next(request)
     
     # Calculate latency after awaiting
-    process_time = time.perf_counter() - start_time
+    process_time = round(time.perf_counter() - start_time, 2)
     
     # Get log id (For save log)
     log_id = getattr(request.state, "db_log_id", None)
@@ -96,10 +96,10 @@ async def add_process_time_header(request: Request, call_next) -> Response:
             db.close()
         
     # Inject in headers
-    response.headers["X-Process-Time"] = f"{process_time:.4f}ms"
+    response.headers["X-Process-Time"] = f"{process_time:.2f}s"
     
     # Log time in Sentinel's logger
-    logger.info(f"Path: {request.url.path} | Latency: {process_time:.4f}ms")
+    logger.info(f"Path: {request.url.path} | Latency: {process_time:.2f}s")
     
     # Return response to user
     return response
