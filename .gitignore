@@ -48,6 +48,4 @@ tests_sentinel/
 logs
 
 # -- Data --
-data/raw/*.csv
-!data/raw/
-!data/processed/
+data/
