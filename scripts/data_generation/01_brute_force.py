@@ -8,13 +8,18 @@ timestamps to simulate brute force attacks.
 # Import pandas to manipulate csv files
 import pandas as pd
 
+# Import os to check output path exists
+import os
+
 # Imports for hinting
 import random
 from datetime import datetime, timedelta
 
-# Define file paths
-FILE_PATH = "..\\..\\data\\raw\\sentinel_report_20260414_1205.csv"
-OUTPUT_PATH = "..\\..\\data\\raw\\sentinel_report_20260414_1205_brute_force.csv"
+# Define first file path
+OUTPUT_PATH = "..\\..\\data\\raw\\sentinel_logs_brute_force.csv"
+
+# Check output path exists
+os.makedirs(os.path.dirname(OUTPUT_PATH), exist_ok=True)
 
 # Cofiguration datetime limit and seconds range
 MIN_DATE = datetime.strptime("2026-02-24 18:15:19", "%Y-%m-%d %H:%M:%S")
@@ -37,65 +42,62 @@ def inject_brute_force() -> None:
     Raises:
         FileNotFoundError: If the source CSV file at FILE_PATH does not exist.
     """
-    try:
-        # Create a DataFrame with Sentinel logs data
-        df = pd.read_csv(FILE_PATH)
-
-        # Get last id from CSV
-        last_id = df['ID'].max() if not df.empty else 0
-
-        # Create a new records list and define id
-        new_records = []
-        current_id = last_id + 1
+    # Create a new records list and define id
+    new_records = []
         
-        # Simulate 5 bursts of attacks
-        for _ in range(5):
-            # Select start time for attack
-            random_start_second = random.randint(0, TOTAL_SECONDS_RANGE - 3600)
+    # Start ID count
+    current_id = 1
 
-            # Calculate a random start time
-            base_time = MIN_DATE + timedelta(seconds=random_start_second)
+    # Simulate 5 bursts of attacks
+    for _ in range(5):
+        # Select start time for attack
+        random_start_second = random.randint(0, TOTAL_SECONDS_RANGE - 3600)
 
-            # Every attack has between 30 and 60 attempts
-            for i in range(random.randint(30, 60)):
-                # Increment timestamps by milliseconds to simulate rapid-fire attempts
-                attack_time = base_time + timedelta(milliseconds=i * 200)
+        # Calculate a random start time
+        base_time = MIN_DATE + timedelta(seconds=random_start_second)
+
+        # Every attack has between 30 and 60 attempts
+        for i in range(random.randint(30, 60)):
+            # Increment timestamps by milliseconds to simulate rapid-fire attempts
+            attack_time = base_time + timedelta(milliseconds=i * 200)
                 
-                # Create log data
-                log = {
-                    "ID": current_id,
-                    "Service name": "Authentication",
-                    "Log Level": "ERROR",
-                    "Message": "Failed login attempt - User: admin",
-                    "Risk Score": random.randint(80, 95),
-                    "Is Anomaly": True,
-                    "Timestamp": attack_time.strftime("%Y-%m-%d %H:%M:%S"),
-                    "Process Time": random.randint(50, 150)
-                }
+            # Create log data
+            log = {
+                "ID": current_id,
+                "Service name": "Authentication",
+                "Log Level": "ERROR",
+                "Message": "Failed login attempt - User: admin",
+                "Risk Score": random.randint(80, 95),
+                "Is Anomaly": True,
+                "Timestamp": attack_time.strftime("%Y-%m-%d %H:%M:%S"),
+                "Process Time": random.randint(50, 150)
+            }
 
-                # Append log to list
-                new_records.append(log)
-                current_id += 1
+            # Append log to list
+            new_records.append(log)
+            current_id += 1
         
-        # Once loop finished, concatenate data to logs
-        df_attack = pd.DataFrame(new_records)
-        df_final = pd.concat([df, df_attack], ignore_index=True)
+    # Once loop finished, create DataFrame
+    df = pd.DataFrame(new_records)
         
-        # Convert Timestamp to datetime objects for accurate sorting
-        df_final['Timestamp'] = pd.to_datetime(df_final['Timestamp'])
+    # Convert Timestamp to datetime objects for accurate sorting
+    df['Timestamp'] = pd.to_datetime(df['Timestamp'])
         
-        # Sort chronologically from oldest to newest
-        df_final = df_final.sort_values(by='Timestamp').reset_index(drop=True)
+    # Sort chronologically from oldest to newest
+    df = df.sort_values(by='Timestamp').reset_index(drop=True)
         
-        # Revert Timestamp back to string format to match your original CSV style
-        df_final['Timestamp'] = df_final['Timestamp'].dt.strftime("%Y-%m-%d %H:%M:%S")
+    # Revert Timestamp back to string format to match your original CSV style
+    df['Timestamp'] = df['Timestamp'].dt.strftime("%Y-%m-%d %H:%M:%S")
 
-        df_final.to_csv(OUTPUT_PATH, index=False)
-        print(f"Phase 1 completed: Injected {len(df_attack)} brute force logs.")
+    try:
+        # Export DataFrame
+        df.to_csv(OUTPUT_PATH, index=False)
+        print(f"Phase 1 completed: Injected {len(df)} brute force logs.")
 
-    # Exception if there's no file found
-    except FileNotFoundError:
-        print("Ensure you have file in data/raw")
+    # Exception if there's a permissions erorr
+    except Exception as e:
+        print(f"[ERROR] Could not save the file: {e}")
 
+# Execute script
 if __name__ == "__main__":
     inject_brute_force()
