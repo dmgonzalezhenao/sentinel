@@ -124,8 +124,8 @@ def main() -> None:
     """
 
     # Define file paths
-    input_path = "..\\..\\data\\raw\\sentinel_logs_final_dataset.csv" 
-    output_path = "..\\..\\data\\processed\\sentinel_cleansed_v1.csv"
+    input_path = "..\\data\\raw\\sentinel_logs_final_dataset.csv" 
+    output_path = "..\\data\\processed\\sentinel_cleansed_v1.csv"
 
     # Ensure output path exists
     processed_dir = os.path.dirname(output_path)

@@ -16,7 +16,7 @@ import random
 from datetime import datetime, timedelta
 
 # Define first file path
-OUTPUT_PATH = "..\\..\\data\\raw\\sentinel_logs_brute_force.csv"
+OUTPUT_PATH = "..\\data\\raw\\sentinel_logs_brute_force.csv"
 
 # Check output path exists
 os.makedirs(os.path.dirname(OUTPUT_PATH), exist_ok=True)

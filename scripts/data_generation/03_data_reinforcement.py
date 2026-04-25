@@ -13,8 +13,8 @@ import random
 from datetime import datetime, timedelta
 
 # Configurate file paths
-INPUT_PATH = "..\\..\\data\\raw\\sentinel_logs_sql_injection.csv"
-OUTPUT_PATH = "..\\..\\data\\raw\\sentinel_logs_sql_injection_balanced.csv"
+INPUT_PATH = "..\\data\\raw\\sentinel_logs_sql_injection.csv"
+OUTPUT_PATH = "..\\data\\raw\\sentinel_logs_sql_injection_balanced.csv"
 
 # Configurate date ranges
 MIN_DATE = datetime.strptime("2026-02-24 18:15:19", "%Y-%m-%d %H:%M:%S")
