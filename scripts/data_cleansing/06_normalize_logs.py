@@ -19,6 +19,9 @@ Key Responsibilities:
 # Import pandas to handle bulk data
 import pandas as pd
 
+# Import os to check output path
+import os
+
 def check_data_quality(df: pd.DataFrame) -> bool:
     """
     Perform a structural and integrity audit on the provided DataFrame.
@@ -124,6 +127,14 @@ def main() -> None:
     input_path = "..\\..\\data\\raw\\sentinel_logs_final_dataset.csv" 
     output_path = "..\\..\\data\\processed\\sentinel_cleansed_v1.csv"
 
+    # Ensure output path exists
+    processed_dir = os.path.dirname(output_path)
+
+    # Create path if doesn't exist
+    if not os.path.exists(processed_dir):
+        os.makedirs(processed_dir)
+        print(f"[INFO] Created missing directory: {processed_dir}")
+    
     try:
         # Read CSv
         df = pd.read_csv(input_path)
