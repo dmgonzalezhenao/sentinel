@@ -16,7 +16,7 @@ import random
 from datetime import datetime, timedelta
 
 # Define first file path
-OUTPUT_PATH = "..\\data\\raw\\sentinel_logs_brute_force.csv"
+OUTPUT_PATH = "data\\raw\\sentinel_logs_brute_force.csv"
 
 # Check output path exists
 os.makedirs(os.path.dirname(OUTPUT_PATH), exist_ok=True)
@@ -70,7 +70,7 @@ def inject_brute_force() -> None:
                 "Risk Score": random.randint(80, 95),
                 "Is Anomaly": True,
                 "Timestamp": attack_time.strftime("%Y-%m-%d %H:%M:%S"),
-                "Process Time": random.randint(50, 150)
+                "Process Time": random.randint(20, 30)
             }
 
             # Append log to list

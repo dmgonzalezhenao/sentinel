@@ -10,8 +10,8 @@ import random
 from datetime import datetime, timedelta
 
 # File paths
-FILE_PATH = "..\\data\\raw\\sentinel_logs_brute_force.csv"
-OUTPUT_PATH = "..\\data\\raw\\sentinel_logs_sql_injection.csv"
+FILE_PATH = "data\\raw\\sentinel_logs_brute_force.csv"
+OUTPUT_PATH = "data\\raw\\sentinel_logs_sql_injection.csv"
 
 # Date range configuration
 MIN_DATE = datetime.strptime("2026-02-24 18:15:19", "%Y-%m-%d %H:%M:%S")
@@ -69,7 +69,7 @@ def inject_sql_injection() -> None:
                 "Risk Score": random.randint(70, 99),
                 "Is Anomaly": True,
                 "Timestamp": attack_time.strftime("%Y-%m-%d %H:%M:%S"),
-                "Process Time": random.randint(20, 45) 
+                "Process Time": random.randint(15, 30) 
             }
 
             # Append log to list

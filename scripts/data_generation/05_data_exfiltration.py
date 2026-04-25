@@ -13,8 +13,8 @@ import random
 from datetime import datetime, timedelta
 
 # Paths configurations
-INPUT_PATH = "..\\data\\raw\\sentinel_logs_xss_injection.csv"
-OUTPUT_PATH = "..\\data\\raw\\sentinel_logs_final_dataset.csv"
+INPUT_PATH = "data\\raw\\sentinel_logs_xss_injection.csv"
+OUTPUT_PATH = "data\\raw\\sentinel_logs_final_dataset.csv"
 
 # Time range configuration
 MIN_DATE = datetime.strptime("2026-02-24 18:15:19", "%Y-%m-%d %H:%M:%S")
@@ -73,7 +73,7 @@ def inject_and_balance_exfiltration() -> None:
                 "Risk Score": random.randint(85, 100),
                 "Is Anomaly": 1,
                 "Timestamp": log_time,
-                "Process Time": random.randint(2000, 8000) 
+                "Process Time": random.randint(1, 10) 
             })
 
         # Generate 2000 Normal Network Logs (Low Process Time)

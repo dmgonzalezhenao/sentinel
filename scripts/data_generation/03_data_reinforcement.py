@@ -13,8 +13,8 @@ import random
 from datetime import datetime, timedelta
 
 # Configurate file paths
-INPUT_PATH = "..\\data\\raw\\sentinel_logs_sql_injection.csv"
-OUTPUT_PATH = "..\\data\\raw\\sentinel_logs_sql_injection_balanced.csv"
+INPUT_PATH = "data\\raw\\sentinel_logs_sql_injection.csv"
+OUTPUT_PATH = "data\\raw\\sentinel_logs_sql_injection_balanced.csv"
 
 # Configurate date ranges
 MIN_DATE = datetime.strptime("2026-02-24 18:15:19", "%Y-%m-%d %H:%M:%S")
@@ -76,7 +76,7 @@ def reinforce_data() -> None:
                     "Risk Score": random.randint(0, 20), # Low risk
                     "Is Anomaly": 0,
                     "Timestamp": log_time.strftime("%Y-%m-%d %H:%M:%S"),
-                    "Process Time": random.randint(5, 30) # Normal time
+                    "Process Time": random.randint(1, 10) # Normal time
                 }
 
                 # Apend log to list

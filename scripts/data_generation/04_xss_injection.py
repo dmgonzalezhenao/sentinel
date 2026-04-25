@@ -14,8 +14,8 @@ import random
 from datetime import datetime, timedelta
 
 # Configurate paths
-INPUT_PATH = "..\\data\\raw\\sentinel_logs_sql_injection_balanced.csv"
-OUTPUT_PATH = "..\\data\\raw\\sentinel_logs_xss_injection.csv"
+INPUT_PATH = "data\\raw\\sentinel_logs_sql_injection_balanced.csv"
+OUTPUT_PATH = "data\\raw\\sentinel_logs_xss_injection.csv"
 
 # Configuration datetime limit and seconds range
 MIN_DATE = datetime.strptime("2026-02-24 18:15:19", "%Y-%m-%d %H:%M:%S")
