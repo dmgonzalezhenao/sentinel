@@ -15,11 +15,23 @@ import os
 import random
 from datetime import datetime, timedelta
 
-# Define first file path
-OUTPUT_PATH = "data\\raw\\sentinel_logs_brute_force.csv"
+# Localize script path
+current_script_path = os.path.abspath(__file__)
+current_dir = os.path.dirname(current_script_path)
 
-# Check output path exists
-os.makedirs(os.path.dirname(OUTPUT_PATH), exist_ok=True)
+# Define project root path
+project_root = os.path.abspath(os.path.join(current_dir, "..", ".."))
+
+# Define data directories
+raw_data_path = os.path.join(project_root, "data", "raw")
+processed_data_path = os.path.join(project_root, "data", "processed")
+
+# Create directories if don't exist
+os.makedirs(raw_data_path, exist_ok=True)
+os.makedirs(processed_data_path, exist_ok=True)
+
+# Define output file's name
+OUTPUT_FILE: str = str(os.path.join(raw_data_path, "sentinel_logs_brute_force.csv"))
 
 # Cofiguration datetime limit and seconds range
 MIN_DATE = datetime.strptime("2026-02-24 18:15:19", "%Y-%m-%d %H:%M:%S")
@@ -70,7 +82,7 @@ def inject_brute_force() -> None:
                 "Risk Score": random.randint(80, 95),
                 "Is Anomaly": True,
                 "Timestamp": attack_time.strftime("%Y-%m-%d %H:%M:%S"),
-                "Process Time": random.randint(20, 30)
+                "Process Time": round(random.uniform(5.0, 25.0), 2)
             }
 
             # Append log to list
@@ -91,7 +103,7 @@ def inject_brute_force() -> None:
 
     try:
         # Export DataFrame
-        df.to_csv(OUTPUT_PATH, index=False)
+        df.to_csv(OUTPUT_FILE, index=False)
         print(f"Phase 1 completed: Injected {len(df)} brute force logs.")
 
     # Exception if there's a permissions erorr

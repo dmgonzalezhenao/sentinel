@@ -13,9 +13,27 @@ import random
 # Import datetime to set datetime data
 from datetime import datetime, timedelta
 
-# Configurate paths
-INPUT_PATH = "data\\raw\\sentinel_logs_sql_injection_balanced.csv"
-OUTPUT_PATH = "data\\raw\\sentinel_logs_xss_injection.csv"
+# Import os to get directories paths
+import os
+
+# Localize script path
+current_script_path = os.path.abspath(__file__)
+current_dir = os.path.dirname(current_script_path)
+
+# Define project root path
+project_root = os.path.abspath(os.path.join(current_dir, "..", ".."))
+
+# Define data directories
+raw_data_path = os.path.join(project_root, "data", "raw")
+processed_data_path = os.path.join(project_root, "data", "processed")
+
+# Create directories if don't exist
+os.makedirs(raw_data_path, exist_ok=True)
+os.makedirs(processed_data_path, exist_ok=True)
+
+# Define input and output files names
+INPUT_FILE: str = str(os.path.join(raw_data_path, "sentinel_logs_data_reinforcement.csv"))
+OUTPUT_FILE: str = str(os.path.join(raw_data_path, "sentinel_logs_xss_injection.csv"))
 
 # Configuration datetime limit and seconds range
 MIN_DATE = datetime.strptime("2026-02-24 18:15:19", "%Y-%m-%d %H:%M:%S")
@@ -62,7 +80,7 @@ def inject_and_balance_xss() -> None:
 
     try:
         # Read CSV file from input path
-        df = pd.read_csv(INPUT_PATH)
+        df = pd.read_csv(INPUT_FILE)
 
         # Set service names
         target_services = ["Frontend-UI", "User-Profile", "Admin-Dashboard"]
@@ -84,7 +102,7 @@ def inject_and_balance_xss() -> None:
                 "Risk Score": random.randint(70, 95),
                 "Is Anomaly": 1,
                 "Timestamp": log_time,
-                "Process Time": random.randint(2, 15)
+                "Process Time": round(random.uniform(5.0, 10.0), 2)
             })
 
         # Generate 3000 normal logs
@@ -121,12 +139,12 @@ def inject_and_balance_xss() -> None:
         df_final['Timestamp'] = df_final['Timestamp'].dt.strftime("%Y-%m-%d %H:%M:%S")
 
         # Save file without pandas generated index
-        df_final.to_csv(OUTPUT_PATH, index=False)
+        df_final.to_csv(OUTPUT_FILE, index=False)
         print(f"Phase 4 Complete: Injected XSS injection scripts. Total: {len(df_final)} logs")
 
     # Exception if there's an error
     except FileNotFoundError:
-        print("Error: Not found base file.")
+        print(f"Error: Not found {INPUT_FILE} file.")
 
 # Execute function
 if __name__ == "__main__":

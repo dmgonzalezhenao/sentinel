@@ -5,13 +5,36 @@ Injects malicious SQL patterns into the log messages to simulate
 SQL injection attempts against the application.
 """
 
+# Import pandas to handle bulk data
 import pandas as pd
+
+# Import random to set random process time and risk score
 import random
+
+# Import datetime to set datetime range
 from datetime import datetime, timedelta
 
-# File paths
-FILE_PATH = "data\\raw\\sentinel_logs_brute_force.csv"
-OUTPUT_PATH = "data\\raw\\sentinel_logs_sql_injection.csv"
+# Import os to get directories paths
+import os
+
+# Localize script path
+current_script_path = os.path.abspath(__file__)
+current_dir = os.path.dirname(current_script_path)
+
+# Define project root path
+project_root = os.path.abspath(os.path.join(current_dir, "..", ".."))
+
+# Define data directories
+raw_data_path = os.path.join(project_root, "data", "raw")
+processed_data_path = os.path.join(project_root, "data", "processed")
+
+# Create directories if don't exist
+os.makedirs(raw_data_path, exist_ok=True)
+os.makedirs(processed_data_path, exist_ok=True)
+
+# Define input and output files names
+INPUT_FILE: str = str(os.path.join(raw_data_path, "sentinel_logs_brute_force.csv"))
+OUTPUT_FILE: str = str(os.path.join(raw_data_path, "sentinel_logs_sql_injection.csv"))
 
 # Date range configuration
 MIN_DATE = datetime.strptime("2026-02-24 18:15:19", "%Y-%m-%d %H:%M:%S")
@@ -47,7 +70,7 @@ def inject_sql_injection() -> None:
     """
     try:
         # Create the DataFrame
-        df = pd.read_csv(FILE_PATH)
+        df = pd.read_csv(INPUT_FILE)
         
         # Create new records list
         new_records = []
@@ -69,7 +92,7 @@ def inject_sql_injection() -> None:
                 "Risk Score": random.randint(70, 99),
                 "Is Anomaly": True,
                 "Timestamp": attack_time.strftime("%Y-%m-%d %H:%M:%S"),
-                "Process Time": random.randint(15, 30) 
+                "Process Time": round(random.uniform(5.0, 29.9), 2)
             }
 
             # Append log to list
@@ -88,13 +111,13 @@ def inject_sql_injection() -> None:
         df_final['ID'] = range(1, len(df_final) + 1)
 
         # Save DataFrame without index
-        df_final.to_csv(OUTPUT_PATH, index=False)
+        df_final.to_csv(OUTPUT_FILE, index=False)
         print(f"Phase 2 completed: Injected {len(df_sql)} SQL Injection logs.")
         print(f"Total records in dataset: {len(df_final)}")
 
     # Exception if there's no file
     except FileNotFoundError:
-        print(f"Error: {FILE_PATH} not found.")
+        print(f"Error: {INPUT_FILE} not found.")
 
 # Execute script
 if __name__ == "__main__":

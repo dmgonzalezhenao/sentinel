@@ -19,7 +19,6 @@ Key Responsibilities:
 # Import pandas to handle bulk data
 import pandas as pd
 
-# Import os to check output path
 import os
 
 def check_data_quality(df: pd.DataFrame) -> bool:
@@ -123,9 +122,15 @@ def main() -> None:
     final, high-fidelity CSV for machine learning model training.
     """
 
+    # Define file location
+    base_path = os.path.dirname(os.path.abspath(__file__))
+
+    # Get project root path
+    project_root = os.path.abspath(os.path.join(base_path, "..", ".."))
+
     # Define file paths
-    input_path = "data\\raw\\sentinel_logs_final_dataset.csv" 
-    output_path = "data\\processed\\sentinel_cleansed_v1.csv"
+    input_path = os.path.join(project_root, "data", "raw", "sentinel_logs_final_dataset.csv") 
+    output_path = os.path.join(project_root, "data", "processed", "sentinel_cleansed_v1.csv")
 
     # Ensure output path exists
     processed_dir = os.path.dirname(output_path)

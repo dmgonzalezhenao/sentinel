@@ -12,9 +12,27 @@ import pandas as pd
 import random
 from datetime import datetime, timedelta
 
-# Configurate file paths
-INPUT_PATH = "data\\raw\\sentinel_logs_sql_injection.csv"
-OUTPUT_PATH = "data\\raw\\sentinel_logs_sql_injection_balanced.csv"
+# Import os to get directories paths
+import os
+
+# Localize script path
+current_script_path = os.path.abspath(__file__)
+current_dir = os.path.dirname(current_script_path)
+
+# Define project root path
+project_root = os.path.abspath(os.path.join(current_dir, "..", ".."))
+
+# Define data directories
+raw_data_path = os.path.join(project_root, "data", "raw")
+processed_data_path = os.path.join(project_root, "data", "processed")
+
+# Create directories if don't exist
+os.makedirs(raw_data_path, exist_ok=True)
+os.makedirs(processed_data_path, exist_ok=True)
+
+# Define input and output files names
+INPUT_FILE: str = str(os.path.join(raw_data_path, "sentinel_logs_sql_injection.csv"))
+OUTPUT_FILE: str = str(os.path.join(raw_data_path, "sentinel_logs_data_reinforcement.csv"))
 
 # Configurate date ranges
 MIN_DATE = datetime.strptime("2026-02-24 18:15:19", "%Y-%m-%d %H:%M:%S")
@@ -58,7 +76,7 @@ def reinforce_data() -> None:
     """
     try:
         # Read file and create new records list
-        df = pd.read_csv(INPUT_PATH)
+        df = pd.read_csv(INPUT_FILE)
         new_records = []
 
         # Generate 1000 logs for each service
@@ -76,7 +94,7 @@ def reinforce_data() -> None:
                     "Risk Score": random.randint(0, 20), # Low risk
                     "Is Anomaly": 0,
                     "Timestamp": log_time.strftime("%Y-%m-%d %H:%M:%S"),
-                    "Process Time": random.randint(1, 10) # Normal time
+                    "Process Time": round(random.uniform(5.0, 10.0), 2) # Normal time
                 }
 
                 # Apend log to list
@@ -97,17 +115,17 @@ def reinforce_data() -> None:
         df_final['Timestamp'] = df_final['Timestamp'].dt.strftime("%Y-%m-%d %H:%M:%S")
 
         # Save file
-        df_final.to_csv(OUTPUT_PATH, index=False)
+        df_final.to_csv(OUTPUT_FILE, index=False)
         
         # Print succesful messages
         print(f"Reinforcement complete.")
         print(f"Added 2000 normal logs.")
-        print(f"Dataset saved in {OUTPUT_PATH}")
+        print(f"Dataset saved in {OUTPUT_FILE}")
         print(f"Total logs: {len(df_final)}")
 
     # Exception if there's no file
     except FileNotFoundError:
-        print(f"Error: Can't find {INPUT_PATH}. Verify path.")
+        print(f"Error: Can't find {INPUT_FILE}. Verify path.")
 
 # Execute script
 if __name__ == "__main__":
