@@ -129,8 +129,8 @@ def main() -> None:
     project_root = os.path.abspath(os.path.join(base_path, "..", ".."))
 
     # Define file paths
-    input_path = os.path.join(project_root, "data", "raw", "sentinel_logs_final_dataset.csv") 
-    output_path = os.path.join(project_root, "data", "processed", "sentinel_cleansed_v1.csv")
+    input_path = os.path.join(project_root, "data", "raw", "sentinel_logs_final_behavioral.csv") 
+    output_path = os.path.join(project_root, "data", "processed", "sentinel_cleansed_v1_1.csv")
 
     # Ensure output path exists
     processed_dir = os.path.dirname(output_path)

@@ -31,7 +31,8 @@ def main():
         "scripts/data_generation/03_data_reinforcement.py", 
         "scripts/data_generation/04_xss_injection.py", 
         "scripts/data_generation/05_data_exfiltration.py", 
-        "scripts/data_cleansing/06_normalize_logs.py"
+        "scripts/data_generation/06_behavioral_patterns.py"
+        "scripts/data_cleansing/07_normalize_logs.py"
     ]
 
     # Print start message
